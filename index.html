@@ -403,9 +403,9 @@ select.form-input{cursor:pointer}
           <button class="btn btn-primary" id="btnGenReport"><i data-lucide="file-plus"></i> 生成报告</button>
         </div>
         <div class="report-filters">
-          <div class="form-group" style="margin-bottom:0;"><label class="form-label">报告类型</label><select class="form-input" style="width:140px;"><option>日报</option><option>周报</option><option>月报</option></select></div>
-          <div class="form-group" style="margin-bottom:0;"><label class="form-label">鱼塘</label><select class="form-input" style="width:140px;"><option>全部</option><option>1号鱼塘</option><option>2号鱼塘</option><option>3号鱼塘</option></select></div>
-          <div class="form-group" style="margin-bottom:0;"><label class="form-label">日期范围</label><input type="date" class="form-input" style="width:160px;" value="2026-06-17"></div>
+          <div class="form-group" style="margin-bottom:0;"><label class="form-label">报告类型</label><select class="form-input" style="width:140px;" id="rptType"><option>日报</option><option>周报</option><option>月报</option></select></div>
+          <div class="form-group" style="margin-bottom:0;"><label class="form-label">鱼塘</label><select class="form-input" style="width:140px;" id="rptPond"><option>全部</option><option>1号鱼塘</option><option>2号鱼塘</option><option>3号鱼塘</option></select></div>
+          <div class="form-group" style="margin-bottom:0;"><label class="form-label">日期范围</label><input type="date" class="form-input" style="width:160px;" id="rptDate" value="2026-06-17"></div>
         </div>
         <table class="data-table">
           <thead><tr><th>报告编号</th><th>类型</th><th>鱼塘</th><th>生成时间</th><th>水质评分</th><th>风险等级</th><th>操作</th></tr></thead>
@@ -513,22 +513,42 @@ function renderRobots(){
   tasks.forEach(function(t){thtml+="<tr><td>"+t.task+"</td><td>"+t.robot+"</td><td class=\"mono\">"+t.time+"</td><td><span class=\"badge badge-"+sb[t.status]+"\">"+t.status+"</span></td></tr>";});
   document.getElementById("taskTable").innerHTML=thtml;lucide.createIcons();
 }
+var reportsData=[
+  {id:"RPT-20260617-001",type:"日报",pond:"全部",time:"2026-06-17 08:00",score:87,risk:"低"},
+  {id:"RPT-20260616-001",type:"日报",pond:"全部",time:"2026-06-16 08:00",score:82,risk:"低"},
+  {id:"RPT-20260609-001",type:"周报",pond:"全部",time:"2026-06-09 09:00",score:79,risk:"中"},
+  {id:"RPT-20260601-001",type:"月报",pond:"全部",time:"2026-06-01 09:00",score:84,risk:"低"},
+  {id:"RPT-20260526-001",type:"日报",pond:"3号鱼塘",time:"2026-05-26 08:00",score:65,risk:"高"}
+];
 function renderReports(){
-  var reports=[
-    {id:"RPT-20260617-001",type:"日报",pond:"全部",time:"2026-06-17 08:00",score:87,risk:"低"},
-    {id:"RPT-20260616-001",type:"日报",pond:"全部",time:"2026-06-16 08:00",score:82,risk:"低"},
-    {id:"RPT-20260609-001",type:"周报",pond:"全部",time:"2026-06-09 09:00",score:79,risk:"中"},
-    {id:"RPT-20260601-001",type:"月报",pond:"全部",time:"2026-06-01 09:00",score:84,risk:"低"},
-    {id:"RPT-20260526-001",type:"日报",pond:"3号鱼塘",time:"2026-05-26 08:00",score:65,risk:"高"}
-  ];
   var rb={"低":"green","中":"orange","高":"red"};
   var html="";
-  reports.forEach(function(r){
+  reportsData.forEach(function(r){
     html+="<tr><td class=\"mono\">"+r.id+"</td><td>"+r.type+"</td><td>"+r.pond+"</td><td class=\"mono\">"+r.time+"</td><td><strong>"+r.score+"</strong></td><td><span class=\"badge badge-"+rb[r.risk]+"\">"+r.risk+"风险</span></td><td><button class=\"btn\" style=\"padding:4px 10px;font-size:12px\"><i data-lucide=\"download\" style=\"width:12px;height:12px\"></i> 导出</button></td></tr>";
   });
   document.getElementById("reportTable").innerHTML=html;lucide.createIcons();
 }
-document.getElementById("btnGenReport").addEventListener("click",function(){alert("报告生成中... 完成后将出现在列表中");});
+document.getElementById("btnGenReport").addEventListener("click",function(){
+  var type=document.getElementById("rptType").value;
+  var pond=document.getElementById("rptPond").value;
+  var date=document.getElementById("rptDate").value;
+  var now=new Date();
+  var pad=function(n){return n<10?"0"+n:n;};
+  var ts=date+" "+pad(now.getHours())+":"+pad(now.getMinutes())+":"+pad(now.getSeconds());
+  var num=reportsData.length+1;
+  var id="RPT-"+date.replace(/-/g,"")+"-"+(num<10?"00"+num:num<100?"0"+num:num);
+  var score=Math.floor(60+Math.random()*35);
+  var risk=score>=80?"低":score>=70?"中":"高";
+  reportsData.unshift({id:id,type:type,pond:pond,time:ts,score:score,risk:risk});
+  renderReports();
+  lucide.createIcons();
+  var badge=document.createElement("div");
+  badge.textContent="✓ 报告 "+id+" 已生成";
+  badge.style.cssText="position:fixed;top:20px;right:20px;background:#f59e0b;color:#fff;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.15);animation:fadeIn .3s";
+  document.body.appendChild(badge);
+  setTimeout(function(){badge.style.opacity="0";badge.style.transition="opacity .5s";},2500);
+  setTimeout(function(){badge.remove();},3000);
+});
 function renderTwinSensors(){
   var sensors=[
     {name:"溶氧 DO",value:"7.2 mg/L",color:"var(--accent-green)"},
