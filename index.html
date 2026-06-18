@@ -272,12 +272,22 @@ select.form-input{cursor:pointer}
   .robot-name{font-size:14px}
 
   /* 数字孪生 */
-  .twin-container{grid-template-columns:1fr;height:auto;gap:12px}
-  .twin-canvas-wrap{min-height:280px}
-  .twin-sidebar{flex-direction:column}
+  .twin-container{display:flex;flex-direction:column;height:auto!important;gap:12px}
+  .twin-canvas-wrap{width:100%;min-height:300px;height:50vh}
+  .twin-sidebar{flex-direction:column;width:100%}
   .twin-overlay{flex-wrap:wrap;gap:4px}
   .twin-overlay .btn{padding:5px 10px;font-size:11px}
   .heatmap-legend{display:none}
+
+  /* 机器人管理 — 强制单列 */
+  #page-robot .cards-row{display:flex;flex-direction:column;gap:12px}
+  #page-robot .section{margin-bottom:0!important}
+
+  /* 报告中心 */
+  #page-report .section{overflow:hidden}
+  .report-filters{flex-direction:column;gap:8px}
+  .report-filters .form-input{width:100%!important}
+  .report-filters .form-group{width:100%}
 
   /* Hero */
   .hero-section{padding:20px 16px;min-height:auto}
@@ -290,8 +300,7 @@ select.form-input{cursor:pointer}
   .hero-stat-label{font-size:11px}
 
   /* 筛选器 */
-  .report-filters{flex-direction:column;gap:8px}
-  .report-filters .form-input{width:100%!important}
+  .  .report-filters .form-input{width:100%!important}
 
   /* 弹窗 */
   #pondModal>div{width:92%;margin:0 4%}
