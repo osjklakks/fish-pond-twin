@@ -220,12 +220,16 @@ select.form-input{cursor:pointer}
 
 /* ===== Phone (<=768px) ===== */
 @media(max-width:768px){
-  /* 底部导航 */
-  .sidebar{height:52px;padding:0 4px}
-  .nav-item{padding:6px 8px;font-size:10px}
-  .nav-item i{width:18px;height:18px}
-  .nav-item span{font-size:9px}
-  .nav-badge{top:1px;right:4px;font-size:8px;padding:0 4px}
+  /* 底部导航 — 7 个图标均匀分布 */
+  .sidebar{height:56px;padding:0}
+  .sidebar-logo{display:none!important}
+  .nav-group-label{display:none!important}
+  .sidebar-nav{display:flex;align-items:center;justify-content:space-around;width:100%;padding:0;gap:0}
+  .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0;font-size:10px;min-width:0;white-space:nowrap}
+  .nav-item i{width:20px;height:20px}
+  .nav-item span{font-size:9px;line-height:1}
+  .nav-badge{top:0;right:2px;font-size:7px;padding:0 3px}
+  .nav-item.active::after{width:16px;height:2px}
 
   /* 主区域 */
   .main{margin-bottom:52px}
@@ -316,8 +320,10 @@ select.form-input{cursor:pointer}
   .hero-stat-val{font-size:20px}
   .data-card-value{font-size:20px}
   .header-time{display:none}
-  .nav-item{padding:5px 6px}
-  .nav-item span{font-size:8px}
+  .sidebar{height:50px}
+  .nav-item{padding:6px 0;gap:1px}
+  .nav-item span{display:none}
+  .nav-item i{width:22px;height:22px}
 }
 
 
