@@ -205,6 +205,30 @@ select.form-input{cursor:pointer}
 .report-card-desc{font-size:12px;color:var(--text-muted)}
 .report-card-footer{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-muted);margin-top:12px}
 
+/* 报告中心统计 */
+.report-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.report-stat{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;transition:all var(--transition)}
+.report-stat:hover{border-color:var(--accent-orange);transform:translateY(-2px);box-shadow:0 4px 16px rgba(245,158,11,.10)}
+.report-stat-icon{width:40px;height:40px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.report-stat-icon i{width:20px;height:20px}
+.report-stat-val{font-family:var(--font-data);font-size:28px;font-weight:700;line-height:1;margin-bottom:4px}
+.report-stat-label{font-size:13px;color:var(--text-muted)}
+.report-stat-change{font-size:12px;margin-top:6px;display:flex;align-items:center;gap:4px}
+.report-stat-change.up{color:var(--accent-green)}
+.report-stat-change.down{color:var(--accent-red)}
+
+/* 报告筛选栏增强 */
+.report-toolbar{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.report-filters{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;flex:1}
+.report-actions{display:flex;gap:8px;flex-shrink:0}
+
+/* 空状态 */
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-muted)}
+.empty-state-icon{width:64px;height:64px;margin:0 auto 16px;background:var(--bg-surface);border-radius:50%;display:flex;align-items:center;justify-content:center}
+.empty-state-icon i{width:28px;height:28px;color:var(--text-muted)}
+.empty-state-title{font-size:16px;font-weight:600;color:var(--text-secondary);margin-bottom:8px}
+.empty-state-desc{font-size:13px;color:var(--text-muted)}
+
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#f3f4f6}::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--border-light)}
 
 /* ===== Tablet (<=1024px) ===== */
@@ -285,9 +309,12 @@ select.form-input{cursor:pointer}
 
   /* 报告中心 */
   #page-report .section{overflow:hidden}
+  .report-summary{grid-template-columns:repeat(2,1fr)}
+  .report-toolbar{flex-direction:column;align-items:stretch}
   .report-filters{flex-direction:column;gap:8px}
   .report-filters .form-input{width:100%!important}
   .report-filters .form-group{width:100%}
+  .report-actions{justify-content:flex-end}
 
   /* Hero */
   .hero-section{padding:20px 16px;min-height:auto}
@@ -300,7 +327,7 @@ select.form-input{cursor:pointer}
   .hero-stat-label{font-size:11px}
 
   /* 筛选器 */
-  .  .report-filters .form-input{width:100%!important}
+  .report-filters .form-input{width:100%!important}
 
   /* 弹窗 */
   #pondModal>div{width:92%!important;max-width:92vw;margin:0 auto}
@@ -329,6 +356,9 @@ select.form-input{cursor:pointer}
   .hero-stats{grid-template-columns:1fr 1fr}
   .hero-stat-val{font-size:20px}
   .data-card-value{font-size:20px}
+  .report-summary{grid-template-columns:1fr 1fr}
+  .report-stat-val{font-size:22px}
+  .report-stat{padding:14px}
   .header-time{display:none}
   .sidebar{height:50px}
   .nav-item{padding:6px 0;gap:1px}
@@ -525,21 +555,53 @@ select.form-input{cursor:pointer}
 
     <!-- Page: 报告中心 -->
     <div class="page" id="page-report">
+      <!-- 统计摘要 -->
+      <div class="report-summary" id="reportSummary"></div>
+
+      <!-- 评分趋势 -->
+      <div class="cards-row cards-2">
+        <div class="section">
+          <div class="section-header"><span class="section-title">水质评分趋势</span>
+            <div class="tabs" id="rptTrendTabs"><span class="tab active" data-range="7">近7天</span><span class="tab" data-range="30">近30天</span></div>
+          </div>
+          <div class="chart-container" id="chartRptTrend"></div>
+        </div>
+        <div class="section">
+          <div class="section-header"><span class="section-title">各鱼塘风险分布</span></div>
+          <div class="chart-container" id="chartRptRisk"></div>
+        </div>
+      </div>
+
+      <!-- 报告列表 -->
       <div class="section">
         <div class="section-header">
-          <span class="section-title">报告中心</span>
-          <button class="btn btn-primary" id="btnGenReport"><i data-lucide="file-plus"></i> 生成报告</button>
+          <span class="section-title">报告列表</span>
+          <div class="report-actions">
+            <button class="btn" id="btnRptReset"><i data-lucide="rotate-ccw"></i> 重置</button>
+            <button class="btn btn-primary" id="btnGenReport"><i data-lucide="file-plus"></i> 生成报告</button>
+          </div>
         </div>
-        <div class="report-filters">
-          <div class="form-group" style="margin-bottom:0;"><label class="form-label">报告类型</label><select class="form-input" style="width:140px;" id="rptType"><option>日报</option><option>周报</option><option>月报</option></select></div>
-          <div class="form-group" style="margin-bottom:0;"><label class="form-label">鱼塘</label><select class="form-input" style="width:140px;" id="rptPond"><option>全部</option><option>1号鱼塘</option><option>2号鱼塘</option><option>3号鱼塘</option></select></div>
-          <div class="form-group" style="margin-bottom:0;"><label class="form-label">日期范围</label><input type="date" class="form-input" style="width:160px;" id="rptDate" value="2026-06-17"></div>
+        <div class="report-toolbar">
+          <div class="report-filters">
+            <div class="form-group" style="margin-bottom:0;"><label class="form-label">报告类型</label><select class="form-input" style="width:130px;" id="rptType"><option value="">全部</option><option>日报</option><option>周报</option><option>月报</option></select></div>
+            <div class="form-group" style="margin-bottom:0;"><label class="form-label">鱼塘</label><select class="form-input" style="width:130px;" id="rptPond"><option value="">全部</option><option>1号鱼塘</option><option>2号鱼塘</option><option>3号鱼塘</option></select></div>
+            <div class="form-group" style="margin-bottom:0;"><label class="form-label">风险等级</label><select class="form-input" style="width:130px;" id="rptRisk"><option value="">全部</option><option>低</option><option>中</option><option>高</option></select></div>
+            <div class="form-group" style="margin-bottom:0;"><label class="form-label">日期范围</label><input type="date" class="form-input" style="width:150px;" id="rptDate" value="2026-06-17"></div>
+          </div>
         </div>
-        <div class="data-table-wrap"><table class="data-table">
-          <thead><tr><th>报告编号</th><th>类型</th><th>鱼塘</th><th>生成时间</th><th>水质评分</th><th>风险等级</th><th>操作</th></tr></thead>
-          <tbody id="reportTable"></tbody>
-        </table>
-      </div>
+        <div id="reportTableWrap">
+          <div class="data-table-wrap"><table class="data-table">
+            <thead><tr><th>报告编号</th><th>类型</th><th>鱼塘</th><th>生成时间</th><th>水质评分</th><th>风险等级</th><th>操作</th></tr></thead>
+            <tbody id="reportTable"></tbody>
+          </table></div>
+        </div>
+        <div id="reportEmpty" style="display:none">
+          <div class="empty-state">
+            <div class="empty-state-icon"><i data-lucide="file-search"></i></div>
+            <div class="empty-state-title">暂无匹配报告</div>
+            <div class="empty-state-desc">请调整筛选条件或生成新报告</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -693,10 +755,96 @@ var reportsData=[
   {id:"RPT-20260601-001",type:"月报",pond:"全部",time:"2026-06-01 09:00",score:84,risk:"低"},
   {id:"RPT-20260526-001",type:"日报",pond:"3号鱼塘",time:"2026-05-26 08:00",score:65,risk:"高"}
 ];
-function renderReports(){
-  var rb={"低":"green","中":"orange","高":"red"};
-  var html="";
+// ===== 报告中心 — 统计摘要 =====
+function renderReportSummary(){
+  var total=reportsData.length;
+  var avgScore=total?Math.round(reportsData.reduce(function(s,r){return s+r.score;},0)/total):0;
+  var highRisk=reportsData.filter(function(r){return r.risk==="高";}).length;
+  var lowRisk=reportsData.filter(function(r){return r.risk==="低";}).length;
+  var html=
+    '<div class="report-stat"><div class="report-stat-icon" style="background:var(--accent-blue-dim)"><i data-lucide="file-text" style="color:var(--accent-blue)"></i></div><div class="report-stat-val" style="color:var(--accent-blue)">'+total+'</div><div class="report-stat-label">报告总数</div></div>'+
+    '<div class="report-stat"><div class="report-stat-icon" style="background:var(--accent-orange-dim)"><i data-lucide="gauge" style="color:var(--accent-orange)"></i></div><div class="report-stat-val" style="color:var(--accent-orange)">'+avgScore+'</div><div class="report-stat-label">平均水质评分</div></div>'+
+    '<div class="report-stat"><div class="report-stat-icon" style="background:var(--accent-red-dim)"><i data-lucide="alert-triangle" style="color:var(--accent-red)"></i></div><div class="report-stat-val" style="color:var(--accent-red)">'+highRisk+'</div><div class="report-stat-label">高风险报告</div></div>'+
+    '<div class="report-stat"><div class="report-stat-icon" style="background:var(--accent-green-dim)"><i data-lucide="shield-check" style="color:var(--accent-green)"></i></div><div class="report-stat-val" style="color:var(--accent-green)">'+lowRisk+'</div><div class="report-stat-label">低风险报告</div><div class="report-stat-change up"><i data-lucide="trending-up" style="width:14px;height:14px"></i> 占比 '+Math.round(lowRisk/total*100)+'%</div></div>';
+  document.getElementById("reportSummary").innerHTML=html;
+  lucide.createIcons();
+}
+
+// ===== 报告中心 — 趋势图 =====
+function renderReportCharts(){
+  // 评分趋势
+  var trendChart=echarts.init(document.getElementById("chartRptTrend"));
+  var sorted=reportsData.slice().sort(function(a,b){return a.time>b.time?1:-1;});
+  var tLabels=sorted.map(function(r){return r.id.replace("RPT-","").replace(/(\d{4})(\d{2})(\d{2})-.*/,"$2/$3");});
+  var tScores=sorted.map(function(r){return r.score;});
+  trendChart.setOption({backgroundColor:"transparent",grid:{left:50,right:20,top:20,bottom:30},
+    xAxis:{type:"category",data:tLabels,axisLine:{lineStyle:{color:"#e5e7eb"}},axisLabel:{color:"#9ca3af",fontSize:11},axisTick:{show:false}},
+    yAxis:{type:"value",min:40,max:100,splitLine:{lineStyle:{color:"#f3f4f6"}},axisLabel:{color:"#9ca3af",fontSize:11},axisLine:{show:false}},
+    series:[{type:"line",data:tScores,smooth:true,symbol:"circle",symbolSize:8,lineStyle:{color:"#f59e0b",width:2},itemStyle:{color:"#f59e0b"},
+      areaStyle:{color:{type:"linear",x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:"rgba(245,158,11,.20)"},{offset:1,color:"rgba(245,158,11,0)"}]}},
+      markLine:{silent:true,lineStyle:{color:"#ef4444",type:"dashed"},data:[{yAxis:70,label:{formatter:"风险线 70",color:"#ef4444",fontSize:11}}]}
+    }],
+    tooltip:{trigger:"axis",backgroundColor:"#fff",borderColor:"#e5e7eb",textStyle:{color:"#1a1a2e",fontSize:12}}
+  });
+
+  // 各鱼塘风险分布
+  var riskChart=echarts.init(document.getElementById("chartRptRisk"));
+  var pondMap={};
   reportsData.forEach(function(r){
+    var p=r.pond;
+    if(!pondMap[p])pondMap[p]={low:0,mid:0,high:0};
+    if(r.risk==="低")pondMap[p].low++;
+    else if(r.risk==="中")pondMap[p].mid++;
+    else pondMap[p].high++;
+  });
+  var pLabels=Object.keys(pondMap);
+  riskChart.setOption({backgroundColor:"transparent",grid:{left:60,right:20,top:10,bottom:30},
+    xAxis:{type:"category",data:pLabels,axisLine:{lineStyle:{color:"#e5e7eb"}},axisLabel:{color:"#9ca3af"},axisTick:{show:false}},
+    yAxis:{type:"value",splitLine:{lineStyle:{color:"#f3f4f6"}},axisLabel:{color:"#9ca3af"},axisLine:{show:false}},
+    series:[
+      {name:"低风险",type:"bar",stack:"total",barWidth:28,data:pLabels.map(function(p){return pondMap[p].low;}),itemStyle:{color:"#16a34a"}},
+      {name:"中风险",type:"bar",stack:"total",data:pLabels.map(function(p){return pondMap[p].mid;}),itemStyle:{color:"#f59e0b"}},
+      {name:"高风险",type:"bar",stack:"total",data:pLabels.map(function(p){return pondMap[p].high;}),itemStyle:{color:"#ef4444"}}
+    ],
+    legend:{data:["低风险","中风险","高风险"],textStyle:{color:"#6b7280",fontSize:12},top:0},
+    tooltip:{trigger:"axis",backgroundColor:"#fff",borderColor:"#e5e7eb",textStyle:{color:"#1a1a2e"}}
+  });
+
+  window.addEventListener("resize",function(){trendChart.resize();riskChart.resize();});
+  window._charts=window._charts||{};
+  window._charts.rptTrend=trendChart;
+  window._charts.rptRisk=riskChart;
+}
+
+// ===== 报告中心 — 筛选 + 列表 =====
+function getFilteredReports(){
+  var type=document.getElementById("rptType").value;
+  var pond=document.getElementById("rptPond").value;
+  var risk=document.getElementById("rptRisk").value;
+  var date=document.getElementById("rptDate").value;
+  return reportsData.filter(function(r){
+    if(type&&r.type!==type)return false;
+    if(pond&&r.pond!==pond)return false;
+    if(risk&&r.risk!==risk)return false;
+    if(date&&!r.time.startsWith(date))return false;
+    return true;
+  });
+}
+function renderReports(){
+  var filtered=getFilteredReports();
+  var rb={"低":"green","中":"orange","高":"red"};
+  var tableWrap=document.getElementById("reportTableWrap");
+  var emptyEl=document.getElementById("reportEmpty");
+  if(filtered.length===0){
+    tableWrap.style.display="none";
+    emptyEl.style.display="block";
+    lucide.createIcons();
+    return;
+  }
+  tableWrap.style.display="block";
+  emptyEl.style.display="none";
+  var html="";
+  filtered.forEach(function(r){
     html+="<tr><td class=\"mono\">"+r.id+"</td><td>"+r.type+"</td><td>"+r.pond+"</td><td class=\"mono\">"+r.time+"</td><td><strong>"+r.score+"</strong></td><td><span class=\"badge badge-"+rb[r.risk]+"\">"+r.risk+"风险</span></td><td><button class=\"btn\" style=\"padding:4px 10px;font-size:12px\" onclick=\"exportReport('"+r.id+"')\"><i data-lucide=\"download\" style=\"width:12px;height:12px\"></i> 导出</button></td></tr>";
   });
   document.getElementById("reportTable").innerHTML=html;lucide.createIcons();
@@ -861,9 +1009,10 @@ function exportReport(reportId){
   });
 }
 
+// ===== 报告中心 — 事件绑定 =====
 document.getElementById("btnGenReport").addEventListener("click",function(){
-  var type=document.getElementById("rptType").value;
-  var pond=document.getElementById("rptPond").value;
+  var type=document.getElementById("rptType").value||"日报";
+  var pond=document.getElementById("rptPond").value||"全部";
   var date=document.getElementById("rptDate").value;
   var now=new Date();
   var pad=function(n){return n<10?"0"+n:n;};
@@ -873,7 +1022,7 @@ document.getElementById("btnGenReport").addEventListener("click",function(){
   var score=Math.floor(60+Math.random()*35);
   var risk=score>=80?"低":score>=70?"中":"高";
   reportsData.unshift({id:id,type:type,pond:pond,time:ts,score:score,risk:risk});
-  renderReports();
+  renderReports();renderReportSummary();renderReportCharts();
   lucide.createIcons();
   var badge=document.createElement("div");
   badge.textContent="✓ 报告 "+id+" 已生成";
@@ -881,6 +1030,27 @@ document.getElementById("btnGenReport").addEventListener("click",function(){
   document.body.appendChild(badge);
   setTimeout(function(){badge.style.opacity="0";badge.style.transition="opacity .5s";},2500);
   setTimeout(function(){badge.remove();},3000);
+});
+
+// 筛选器变化时刷新列表
+["rptType","rptPond","rptRisk","rptDate"].forEach(function(id){
+  document.getElementById(id).addEventListener("change",renderReports);
+});
+// 重置按钮
+document.getElementById("btnRptReset").addEventListener("click",function(){
+  document.getElementById("rptType").value="";
+  document.getElementById("rptPond").value="";
+  document.getElementById("rptRisk").value="";
+  document.getElementById("rptDate").value="2026-06-17";
+  renderReports();
+});
+// 趋势图时间范围切换
+document.getElementById("rptTrendTabs").addEventListener("click",function(e){
+  var tab=e.target.closest(".tab");
+  if(!tab)return;
+  this.querySelectorAll(".tab").forEach(function(t){t.classList.remove("active");});
+  tab.classList.add("active");
+  renderReportCharts();
 });
 function renderTwinSensors(){
   var sensors=[
@@ -910,6 +1080,7 @@ function initCharts(){
   var rh=[];for(var i=0;i<12;i++)rh.push((8+i)+":00");
   robotChart.setOption({backgroundColor:"transparent",grid:{left:50,right:50,top:30,bottom:30},legend:{data:["AquaBot-01","AquaBot-02","AquaBot-03"],textStyle:{color:"#6b7280",fontSize:12},top:0},xAxis:{type:"category",data:rh,axisLine:{lineStyle:{color:"#e5e7eb"}},axisLabel:{color:"#9ca3af"},axisTick:{show:false}},yAxis:{type:"value",max:100,name:"电量 %",nameTextStyle:{color:"#64748b"},splitLine:{lineStyle:{color:"#f3f4f6"}},axisLabel:{color:"#9ca3af"},axisLine:{show:false}},series:[{name:"AquaBot-01",type:"line",data:[100,95,88,82,78,75,70,65,60,55,50,45],smooth:true,symbol:"none",lineStyle:{color:"#f59e0b",width:2},itemStyle:{color:"#f59e0b"}},{name:"AquaBot-02",type:"line",data:[20,25,30,35,40,50,60,70,80,85,90,95],smooth:true,symbol:"none",lineStyle:{color:"#a78bfa",width:2},itemStyle:{color:"#a78bfa"}},{name:"AquaBot-03",type:"line",data:[100,98,96,94,92,90,88,86,84,82,80,78],smooth:true,symbol:"none",lineStyle:{color:"#f59e0b",width:2},itemStyle:{color:"#f59e0b"}}],tooltip:{trigger:"axis",backgroundColor:"#fff",borderColor:"#e5e7eb",textStyle:{color:"#1a1a2e"}}});
   renderTwinSensors();
+  renderReportCharts();
   window.addEventListener("resize",function(){doChart.resize();radarChart.resize();barChart.resize();multiChart.resize();robotChart.resize();});
   window._charts={doChart:doChart,radarChart:radarChart,barChart:barChart,multiChart:multiChart,robotChart:robotChart};
 }
@@ -1008,6 +1179,7 @@ function simulateData(){
 window.addEventListener("DOMContentLoaded",function(){
   renderSensorCards();renderMonitorCards();renderAlerts();
   renderPondGrid();renderRobots();renderReports();
+  renderReportSummary();
   setTimeout(initCharts,300);
   setInterval(simulateData,5000);
 });
