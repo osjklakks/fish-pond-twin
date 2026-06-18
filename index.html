@@ -207,8 +207,118 @@ select.form-input{cursor:pointer}
 
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#f3f4f6}::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--border-light)}
 
-@media(max-width:1200px){.cards-4{grid-template-columns:repeat(2,1fr)}.pond-grid{grid-template-columns:repeat(2,1fr)}.twin-container{grid-template-columns:1fr}.twin-sidebar{flex-direction:row;overflow-x:auto}.hero-stats{grid-template-columns:repeat(2,1fr)}.footer-grid{grid-template-columns:1fr 1fr}.report-card-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:768px){.sidebar{width:60px}.sidebar-logo span,.nav-item span,.nav-group-label{display:none}.nav-item{justify-content:center;padding:12px}.main{margin-left:60px}.cards-4,.cards-3{grid-template-columns:1fr}.pond-grid,.report-card-grid{grid-template-columns:1fr}.hero-title{font-size:36px}.hero-stats{grid-template-columns:1fr 1fr}.footer-grid{grid-template-columns:1fr}}
+/* ===== Tablet (<=1024px) ===== */
+@media(max-width:1024px){
+  .cards-4{grid-template-columns:repeat(2,1fr)}
+  .pond-grid{grid-template-columns:repeat(2,1fr)}
+  .twin-container{grid-template-columns:1fr;height:auto;min-height:400px}
+  .twin-canvas-wrap{min-height:350px}
+  .twin-sidebar{flex-direction:row;overflow-x:auto}
+  .hero-stats{grid-template-columns:repeat(2,1fr)}
+  .footer-grid{grid-template-columns:1fr 1fr}
+}
+
+/* ===== Phone (<=768px) ===== */
+@media(max-width:768px){
+  /* 底部导航 */
+  .sidebar{height:52px;padding:0 4px}
+  .nav-item{padding:6px 8px;font-size:10px}
+  .nav-item i{width:18px;height:18px}
+  .nav-item span{font-size:9px}
+  .nav-badge{top:1px;right:4px;font-size:8px;padding:0 4px}
+
+  /* 主区域 */
+  .main{margin-bottom:52px}
+  .header{padding:0 12px;height:48px}
+  .header-title{font-size:14px}
+  .header-breadcrumb{display:none}
+  .header-time{font-size:11px;padding:4px 8px}
+  .content{padding:12px}
+
+  /* 网格全部单列 */
+  .cards-4,.cards-3,.cards-2{grid-template-columns:1fr}
+  .pond-grid{grid-template-columns:1fr}
+  .hero-stats{grid-template-columns:1fr 1fr}
+
+  /* 卡片 */
+  .data-card{padding:14px}
+  .data-card-value{font-size:22px}
+  .data-card-label{font-size:12px}
+  .section{padding:14px;margin-bottom:12px}
+  .section-title{font-size:14px}
+
+  /* 图表 */
+  .chart-container{height:220px}
+  .chart-container-lg{height:260px}
+
+  /* 表格横向滚动 */
+  .data-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .data-table{min-width:500px}
+  .data-table th,.data-table td{padding:8px 10px;font-size:12px}
+
+  /* 鱼塘卡片 */
+  .pond-card{padding:14px}
+  .pond-card-title{font-size:14px}
+  .pond-card-meta{font-size:11px}
+
+  /* 机器人卡片 */
+  .robot-card{padding:14px;flex-wrap:wrap}
+  .robot-avatar{width:44px;height:44px}
+  .robot-avatar i{width:22px;height:22px}
+  .robot-name{font-size:14px}
+
+  /* 数字孪生 */
+  .twin-container{grid-template-columns:1fr;height:auto;gap:12px}
+  .twin-canvas-wrap{min-height:280px}
+  .twin-sidebar{flex-direction:column}
+  .twin-overlay{flex-wrap:wrap;gap:4px}
+  .twin-overlay .btn{padding:5px 10px;font-size:11px}
+  .heatmap-legend{display:none}
+
+  /* Hero */
+  .hero-section{padding:20px 16px;min-height:auto}
+  .hero-title{font-size:28px;margin-bottom:12px}
+  .hero-subtitle{font-size:14px;margin-bottom:20px}
+  .hero-actions{gap:8px;margin-bottom:24px}
+  .hero-actions .btn{padding:10px 18px;font-size:13px}
+  .hero-stat{padding:14px 10px}
+  .hero-stat-val{font-size:24px}
+  .hero-stat-label{font-size:11px}
+
+  /* 筛选器 */
+  .report-filters{flex-direction:column;gap:8px}
+  .report-filters .form-input{width:100%!important}
+
+  /* 弹窗 */
+  #pondModal>div{width:92%;margin:0 4%}
+
+  /* 页脚 */
+  .footer{padding:24px 16px}
+  .footer-grid{grid-template-columns:1fr;gap:20px}
+  .footer-col-title{font-size:13px}
+
+  /* Badge */
+  .badge{font-size:11px;padding:2px 8px}
+
+  /* WQI */
+  .wqi-ring{width:80px;height:80px}
+  .wqi-score{font-size:22px}
+
+  /* 按钮 */
+  .btn{padding:5px 12px;font-size:12px}
+  .btn-primary{padding:8px 16px;font-size:13px}
+}
+
+/* ===== Small phone (<=375px) ===== */
+@media(max-width:375px){
+  .hero-title{font-size:24px}
+  .hero-stats{grid-template-columns:1fr 1fr}
+  .hero-stat-val{font-size:20px}
+  .data-card-value{font-size:20px}
+  .header-time{display:none}
+  .nav-item{padding:5px 6px}
+  .nav-item span{font-size:8px}
+}
 
 
 </style>
@@ -334,10 +444,10 @@ select.form-input{cursor:pointer}
         </div>
         <div class="section">
           <div class="section-header"><span class="section-title">报警记录</span></div>
-          <table class="data-table">
+          <div class="data-table-wrap"><table class="data-table">
             <thead><tr><th>时间</th><th>鱼塘</th><th>类型</th><th>等级</th><th>状态</th></tr></thead>
             <tbody id="alertTable"></tbody>
-          </table>
+          </table></div></div></div></div></div></div>
         </div>
       </div>
     </div>
@@ -385,7 +495,7 @@ select.form-input{cursor:pointer}
         </div>
         <div class="section" style="margin-bottom:0;">
           <div class="section-header"><span class="section-title">任务调度</span></div>
-          <table class="data-table">
+          <div class="data-table-wrap"><table class="data-table">
             <thead><tr><th>任务</th><th>机器人</th><th>时间</th><th>状态</th></tr></thead>
             <tbody id="taskTable"></tbody>
           </table>
@@ -409,7 +519,7 @@ select.form-input{cursor:pointer}
           <div class="form-group" style="margin-bottom:0;"><label class="form-label">鱼塘</label><select class="form-input" style="width:140px;" id="rptPond"><option>全部</option><option>1号鱼塘</option><option>2号鱼塘</option><option>3号鱼塘</option></select></div>
           <div class="form-group" style="margin-bottom:0;"><label class="form-label">日期范围</label><input type="date" class="form-input" style="width:160px;" id="rptDate" value="2026-06-17"></div>
         </div>
-        <table class="data-table">
+        <div class="data-table-wrap"><table class="data-table">
           <thead><tr><th>报告编号</th><th>类型</th><th>鱼塘</th><th>生成时间</th><th>水质评分</th><th>风险等级</th><th>操作</th></tr></thead>
           <tbody id="reportTable"></tbody>
         </table>
