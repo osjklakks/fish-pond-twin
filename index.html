@@ -772,11 +772,21 @@ function renderReportSummary(){
 
 // ===== 报告中心 — 趋势图 =====
 function renderReportCharts(){
-  // 评分趋势
-  var trendChart=echarts.init(document.getElementById("chartRptTrend"));
-  var sorted=reportsData.slice().sort(function(a,b){return a.time>b.time?1:-1;});
-  var tLabels=sorted.map(function(r){return r.id.replace("RPT-","").replace(/(\d{4})(\d{2})(\d{2})-.*/,"$2/$3");});
-  var tScores=sorted.map(function(r){return r.score;});
+  // 复用或创建实例，避免重复 init
+  var trendChart=window._charts&&window._charts.rptTrend?window._charts.rptTrend:echarts.init(document.getElementById("chartRptTrend"));
+  var riskChart=window._charts&&window._charts.rptRisk?window._charts.rptRisk:echarts.init(document.getElementById("chartRptRisk"));
+
+  // 评分趋势 — 按时间范围过滤
+  var rangeTab=document.querySelector("#rptTrendTabs .tab.active");
+  var days=rangeTab?parseInt(rangeTab.dataset.range,10):7;
+  var now=new Date("2026-06-17T23:59:59");
+  var cutoff=new Date(now-days*86400000);
+  var filtered=reportsData.filter(function(r){
+    var d=new Date(r.time.split(" ")[0]);
+    return d>=cutoff;
+  }).sort(function(a,b){return a.time>b.time?1:-1;});
+  var tLabels=filtered.map(function(r){return r.time.split(" ")[0].replace(/^\d{4}-/,"");});
+  var tScores=filtered.map(function(r){return r.score;});
   trendChart.setOption({backgroundColor:"transparent",grid:{left:50,right:20,top:20,bottom:30},
     xAxis:{type:"category",data:tLabels,axisLine:{lineStyle:{color:"#e5e7eb"}},axisLabel:{color:"#9ca3af",fontSize:11},axisTick:{show:false}},
     yAxis:{type:"value",min:40,max:100,splitLine:{lineStyle:{color:"#f3f4f6"}},axisLabel:{color:"#9ca3af",fontSize:11},axisLine:{show:false}},
@@ -785,32 +795,30 @@ function renderReportCharts(){
       markLine:{silent:true,lineStyle:{color:"#ef4444",type:"dashed"},data:[{yAxis:70,label:{formatter:"风险线 70",color:"#ef4444",fontSize:11}}]}
     }],
     tooltip:{trigger:"axis",backgroundColor:"#fff",borderColor:"#e5e7eb",textStyle:{color:"#1a1a2e",fontSize:12}}
-  });
+  },true);
 
-  // 各鱼塘风险分布
-  var riskChart=echarts.init(document.getElementById("chartRptRisk"));
-  var pondMap={};
+  // 各鱼塘风险分布 — 按报告类型分组，避免数据过于稀疏
+  var typeMap={};
   reportsData.forEach(function(r){
-    var p=r.pond;
-    if(!pondMap[p])pondMap[p]={low:0,mid:0,high:0};
-    if(r.risk==="低")pondMap[p].low++;
-    else if(r.risk==="中")pondMap[p].mid++;
-    else pondMap[p].high++;
+    var t=r.type;
+    if(!typeMap[t])typeMap[t]={low:0,mid:0,high:0};
+    if(r.risk==="低")typeMap[t].low++;
+    else if(r.risk==="中")typeMap[t].mid++;
+    else typeMap[t].high++;
   });
-  var pLabels=Object.keys(pondMap);
-  riskChart.setOption({backgroundColor:"transparent",grid:{left:60,right:20,top:10,bottom:30},
-    xAxis:{type:"category",data:pLabels,axisLine:{lineStyle:{color:"#e5e7eb"}},axisLabel:{color:"#9ca3af"},axisTick:{show:false}},
+  var tLabels2=Object.keys(typeMap);
+  riskChart.setOption({backgroundColor:"transparent",grid:{left:60,right:20,top:30,bottom:30},
+    xAxis:{type:"category",data:tLabels2,axisLine:{lineStyle:{color:"#e5e7eb"}},axisLabel:{color:"#9ca3af"},axisTick:{show:false}},
     yAxis:{type:"value",splitLine:{lineStyle:{color:"#f3f4f6"}},axisLabel:{color:"#9ca3af"},axisLine:{show:false}},
     series:[
-      {name:"低风险",type:"bar",stack:"total",barWidth:28,data:pLabels.map(function(p){return pondMap[p].low;}),itemStyle:{color:"#16a34a"}},
-      {name:"中风险",type:"bar",stack:"total",data:pLabels.map(function(p){return pondMap[p].mid;}),itemStyle:{color:"#f59e0b"}},
-      {name:"高风险",type:"bar",stack:"total",data:pLabels.map(function(p){return pondMap[p].high;}),itemStyle:{color:"#ef4444"}}
+      {name:"低风险",type:"bar",stack:"total",barWidth:36,data:tLabels2.map(function(t){return typeMap[t].low;}),itemStyle:{color:"#16a34a",borderRadius:[0,0,0,0]}},
+      {name:"中风险",type:"bar",stack:"total",data:tLabels2.map(function(t){return typeMap[t].mid;}),itemStyle:{color:"#f59e0b"}},
+      {name:"高风险",type:"bar",stack:"total",data:tLabels2.map(function(t){return typeMap[t].high;}),itemStyle:{color:"#ef4444",borderRadius:[4,4,0,0]}}
     ],
     legend:{data:["低风险","中风险","高风险"],textStyle:{color:"#6b7280",fontSize:12},top:0},
     tooltip:{trigger:"axis",backgroundColor:"#fff",borderColor:"#e5e7eb",textStyle:{color:"#1a1a2e"}}
-  });
+  },true);
 
-  window.addEventListener("resize",function(){trendChart.resize();riskChart.resize();});
   window._charts=window._charts||{};
   window._charts.rptTrend=trendChart;
   window._charts.rptRisk=riskChart;
@@ -1081,7 +1089,7 @@ function initCharts(){
   robotChart.setOption({backgroundColor:"transparent",grid:{left:50,right:50,top:30,bottom:30},legend:{data:["AquaBot-01","AquaBot-02","AquaBot-03"],textStyle:{color:"#6b7280",fontSize:12},top:0},xAxis:{type:"category",data:rh,axisLine:{lineStyle:{color:"#e5e7eb"}},axisLabel:{color:"#9ca3af"},axisTick:{show:false}},yAxis:{type:"value",max:100,name:"电量 %",nameTextStyle:{color:"#64748b"},splitLine:{lineStyle:{color:"#f3f4f6"}},axisLabel:{color:"#9ca3af"},axisLine:{show:false}},series:[{name:"AquaBot-01",type:"line",data:[100,95,88,82,78,75,70,65,60,55,50,45],smooth:true,symbol:"none",lineStyle:{color:"#f59e0b",width:2},itemStyle:{color:"#f59e0b"}},{name:"AquaBot-02",type:"line",data:[20,25,30,35,40,50,60,70,80,85,90,95],smooth:true,symbol:"none",lineStyle:{color:"#a78bfa",width:2},itemStyle:{color:"#a78bfa"}},{name:"AquaBot-03",type:"line",data:[100,98,96,94,92,90,88,86,84,82,80,78],smooth:true,symbol:"none",lineStyle:{color:"#f59e0b",width:2},itemStyle:{color:"#f59e0b"}}],tooltip:{trigger:"axis",backgroundColor:"#fff",borderColor:"#e5e7eb",textStyle:{color:"#1a1a2e"}}});
   renderTwinSensors();
   renderReportCharts();
-  window.addEventListener("resize",function(){doChart.resize();radarChart.resize();barChart.resize();multiChart.resize();robotChart.resize();});
+  window.addEventListener("resize",function(){doChart.resize();radarChart.resize();barChart.resize();multiChart.resize();robotChart.resize();if(window._charts.rptTrend)window._charts.rptTrend.resize();if(window._charts.rptRisk)window._charts.rptRisk.resize();});
   window._charts={doChart:doChart,radarChart:radarChart,barChart:barChart,multiChart:multiChart,robotChart:robotChart};
 }
 // ===== Three.js Digital Twin =====
