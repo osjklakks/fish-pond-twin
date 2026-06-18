@@ -606,6 +606,7 @@ var titles={home:["首页","智氧兴渔 / 智能鱼塘监控系统"],dashboard:
 function switchPage(page){
   document.querySelectorAll(".page").forEach(function(p){p.classList.remove("active");});
   document.querySelectorAll(".nav-item").forEach(function(n){n.classList.remove("active");});
+  document.querySelector(".content").scrollTop=0;
   document.getElementById("page-"+page).classList.add("active");
   var el=document.querySelector('[data-page="'+page+'"]');if(el)el.classList.add("active");
   if(titles[page]){document.getElementById("pageTitle").textContent=titles[page][0];document.getElementById("pageBreadcrumb").textContent=titles[page][1];}
