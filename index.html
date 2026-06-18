@@ -79,8 +79,11 @@ body{min-height:100%;font-family:var(--font-ui);background:var(--bg-deep);color:
 .section{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
 .section-title{font-size:15px;font-weight:600}
-.chart-container{width:100%;height:280px}
-.chart-container-lg{width:100%;height:440px}
+.chart-container{width:100%;height:280px;min-height:0}
+.chart-container-lg{width:100%;flex:1;min-height:320px}
+/* 让含图表的 section 用 flex 纵向布局，chart 自动填满剩余高度 */
+.section.has-chart{display:flex;flex-direction:column}
+.section.has-chart .chart-container,.section.has-chart .chart-container-lg{flex:1;min-height:0}
 
 .btn{padding:6px 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg-surface);color:var(--text-secondary);font-size:13px;cursor:pointer;transition:all var(--transition);font-family:var(--font-ui);display:inline-flex;align-items:center;gap:6px}
 .btn:hover{background:#fff7ed;color:var(--accent-orange);border-color:var(--accent-orange)}
@@ -277,7 +280,7 @@ select.form-input{cursor:pointer}
 
   /* 图表 */
   .chart-container{height:220px}
-  .chart-container-lg{height:320px}
+  .chart-container-lg{min-height:260px}
 
   /* 表格横向滚动 */
   .data-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%;max-width:100%}
@@ -561,13 +564,13 @@ select.form-input{cursor:pointer}
 
       <!-- 评分趋势 -->
       <div class="cards-row cards-2">
-        <div class="section">
+        <div class="section has-chart">
           <div class="section-header"><span class="section-title">水质评分趋势</span>
             <div class="tabs" id="rptTrendTabs"><span class="tab active" data-range="7">近7天</span><span class="tab" data-range="30">近30天</span></div>
           </div>
           <div class="chart-container-lg" id="chartRptTrend"></div>
         </div>
-        <div class="section">
+        <div class="section has-chart">
           <div class="section-header"><span class="section-title">各鱼塘风险分布</span></div>
           <div class="chart-container-lg" id="chartRptRisk"></div>
         </div>
@@ -673,7 +676,15 @@ function switchPage(page){
   var el=document.querySelector('[data-page="'+page+'"]');if(el)el.classList.add("active");
   if(titles[page]){document.getElementById("pageTitle").textContent=titles[page][0];document.getElementById("pageBreadcrumb").textContent=titles[page][1];}
   if(page==="twin"&&!twinInited)setTimeout(initThreeScene,200);
-  if(window._charts)Object.values(window._charts).forEach(function(c){c.resize();});
+  // 懒初始化报告图表（容器之前 display:none 尺寸为 0）
+  if(page==="report"&&!window._rptChartInited){
+    window._rptChartInited=true;
+    setTimeout(function(){renderReportCharts();renderReportSummary();},100);
+  }
+  // 切换后统一 resize 所有图表
+  setTimeout(function(){
+    if(window._charts)Object.values(window._charts).forEach(function(c){if(c&&!c.isDisposed())c.resize();});
+  },60);
 }
 document.querySelectorAll(".nav-item").forEach(function(el){el.addEventListener("click",function(){switchPage(el.dataset.page);});});
 function updateClock(){var now=new Date();document.getElementById("headerTime").textContent=now.toLocaleDateString("zh-CN",{month:"2-digit",day:"2-digit"})+" "+now.toLocaleTimeString("zh-CN",{hour12:false});}
@@ -1031,7 +1042,8 @@ document.getElementById("btnGenReport").addEventListener("click",function(){
   var score=Math.floor(60+Math.random()*35);
   var risk=score>=80?"低":score>=70?"中":"高";
   reportsData.unshift({id:id,type:type,pond:pond,time:ts,score:score,risk:risk});
-  renderReports();renderReportSummary();renderReportCharts();
+  renderReports();renderReportSummary();
+  if(window._rptChartInited)renderReportCharts();
   lucide.createIcons();
   var badge=document.createElement("div");
   badge.textContent="✓ 报告 "+id+" 已生成";
@@ -1089,7 +1101,6 @@ function initCharts(){
   var rh=[];for(var i=0;i<12;i++)rh.push((8+i)+":00");
   robotChart.setOption({backgroundColor:"transparent",grid:{left:50,right:50,top:30,bottom:30},legend:{data:["AquaBot-01","AquaBot-02","AquaBot-03"],textStyle:{color:"#6b7280",fontSize:12},top:0},xAxis:{type:"category",data:rh,axisLine:{lineStyle:{color:"#e5e7eb"}},axisLabel:{color:"#9ca3af"},axisTick:{show:false}},yAxis:{type:"value",max:100,name:"电量 %",nameTextStyle:{color:"#64748b"},splitLine:{lineStyle:{color:"#f3f4f6"}},axisLabel:{color:"#9ca3af"},axisLine:{show:false}},series:[{name:"AquaBot-01",type:"line",data:[100,95,88,82,78,75,70,65,60,55,50,45],smooth:true,symbol:"none",lineStyle:{color:"#f59e0b",width:2},itemStyle:{color:"#f59e0b"}},{name:"AquaBot-02",type:"line",data:[20,25,30,35,40,50,60,70,80,85,90,95],smooth:true,symbol:"none",lineStyle:{color:"#a78bfa",width:2},itemStyle:{color:"#a78bfa"}},{name:"AquaBot-03",type:"line",data:[100,98,96,94,92,90,88,86,84,82,80,78],smooth:true,symbol:"none",lineStyle:{color:"#f59e0b",width:2},itemStyle:{color:"#f59e0b"}}],tooltip:{trigger:"axis",backgroundColor:"#fff",borderColor:"#e5e7eb",textStyle:{color:"#1a1a2e"}}});
   renderTwinSensors();
-  renderReportCharts();
   window.addEventListener("resize",function(){doChart.resize();radarChart.resize();barChart.resize();multiChart.resize();robotChart.resize();if(window._charts.rptTrend)window._charts.rptTrend.resize();if(window._charts.rptRisk)window._charts.rptRisk.resize();});
   window._charts={doChart:doChart,radarChart:radarChart,barChart:barChart,multiChart:multiChart,robotChart:robotChart};
 }
@@ -1188,7 +1199,6 @@ function simulateData(){
 window.addEventListener("DOMContentLoaded",function(){
   renderSensorCards();renderMonitorCards();renderAlerts();
   renderPondGrid();renderRobots();renderReports();
-  renderReportSummary();
   setTimeout(initCharts,300);
   setInterval(simulateData,5000);
 });
