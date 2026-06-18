@@ -14,15 +14,15 @@
 
 
 :root {
-  --bg-deep:#070b14;--bg-base:#0c1220;--bg-card:#111827;--bg-card-hover:#1a2332;
-  --bg-surface:#1e293b;--border:#1e293b;--border-light:#2d3a4d;
-  --text-primary:#f1f5f9;--text-secondary:#94a3b8;--text-muted:#64748b;
-  --accent-green:#22c55e;--accent-green-dim:rgba(34,197,94,.12);
-  --accent-blue:#38bdf8;--accent-blue-dim:rgba(56,189,248,.12);
-  --accent-orange:#f59e0b;--accent-orange-dim:rgba(245,158,11,.12);
-  --accent-red:#ef4444;--accent-red-dim:rgba(239,68,68,.12);
-  --accent-cyan:#22d3ee;--accent-cyan-dim:rgba(34,211,238,.12);
-  --accent-purple:#a78bfa;
+  --bg-deep:#fafafa;--bg-base:#ffffff;--bg-card:#ffffff;--bg-card-hover:#fff7ed;
+  --bg-surface:#f3f4f6;--border:#e5e7eb;--border-light:#d1d5db;
+  --text-primary:#1a1a2e;--text-secondary:#6b7280;--text-muted:#9ca3af;
+  --accent-green:#16a34a;--accent-green-dim:rgba(22,163,74,.10);
+  --accent-blue:#2563eb;--accent-blue-dim:rgba(37,99,235,.10);
+  --accent-orange:#f59e0b;--accent-orange-dim:rgba(245,158,11,.10);
+  --accent-red:#ef4444;--accent-red-dim:rgba(239,68,68,.10);
+  --accent-cyan:#f59e0b;--accent-cyan-dim:rgba(245,158,11,.10);
+  --accent-purple:#8b5cf6;
   --sidebar-w:220px;--header-h:56px;--radius:8px;--radius-lg:12px;
   --font-data:"Fira Code","Noto Sans SC",monospace;
   --font-ui:"Noto Sans SC",-apple-system,sans-serif;
@@ -32,27 +32,27 @@
 html,body{height:100%;font-family:var(--font-ui);background:var(--bg-deep);color:var(--text-primary);overflow:hidden}
 body{display:flex}
 
-.sidebar{width:100%;height:56px;background:var(--bg-base);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;position:fixed;bottom:0;left:0;z-index:100}
+.sidebar{width:100%;height:56px;background:#fff;border-top:1px solid var(--border);box-shadow:0 -2px 12px rgba(0,0,0,.06);display:flex;align-items:center;justify-content:center;position:fixed;bottom:0;left:0;z-index:100}
 .sidebar-logo{display:none}
 .sidebar-nav{display:flex;align-items:center;gap:4px;padding:0 12px;overflow-x:auto}
 .nav-group-label{display:none}
 .nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 16px;border-radius:var(--radius);cursor:pointer;transition:all var(--transition);color:var(--text-muted);font-size:11px;text-decoration:none;position:relative;white-space:nowrap}
 .nav-item:hover{background:var(--bg-surface);color:var(--text-primary)}
-.nav-item.active{color:var(--accent-green)}
-.nav-item.active::after{content:"";position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);width:20px;height:2px;background:var(--accent-green);border-radius:2px}
+.nav-item.active{color:var(--accent-orange)}
+.nav-item.active::after{content:"";position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);width:20px;height:2px;background:var(--accent-orange);border-radius:2px}
 .nav-item i{width:20px;height:20px;flex-shrink:0}
 .nav-item span{font-size:10px}
 .nav-badge{position:absolute;top:2px;right:8px;background:var(--accent-red);color:#fff;font-size:9px;padding:0 5px;border-radius:8px;font-weight:600}
 
 .main{margin-bottom:56px;margin-left:0;flex:1;display:flex;flex-direction:column;height:100vh}
-.header{height:var(--header-h);background:var(--bg-base);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0}
+.header{height:var(--header-h);background:#fff;border-bottom:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.04);display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0}
 .header-left{display:flex;align-items:center;gap:16px}
 .header-title{font-size:16px;font-weight:600}
 .header-breadcrumb{font-size:13px;color:var(--text-muted)}
 .header-right{display:flex;align-items:center;gap:16px}
 .header-time{font-family:var(--font-data);font-size:13px;color:var(--text-secondary);background:var(--bg-card);padding:5px 12px;border-radius:var(--radius)}
-.header-status{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--accent-green)}
-.header-status .dot{width:8px;height:8px;background:var(--accent-green);border-radius:50%;animation:pulse 2s infinite}
+.header-status{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--accent-orange)}
+.header-status .dot{width:8px;height:8px;background:var(--accent-orange);border-radius:50%;animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .content{flex:1;overflow-y:auto;padding:24px;background:var(--bg-deep)}
 .page{display:none}.page.active{display:block}
@@ -62,7 +62,7 @@ body{display:flex}
 .cards-3{grid-template-columns:repeat(3,1fr)}
 .cards-2{grid-template-columns:repeat(2,1fr)}
 .data-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;position:relative;transition:all var(--transition);overflow:hidden}
-.data-card:hover{border-color:var(--border-light);transform:translateY(-1px)}
+.data-card:hover{border-color:var(--accent-orange);transform:translateY(-2px);box-shadow:0 4px 16px rgba(245,158,11,.10)}
 .data-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
 .data-card-label{font-size:13px;color:var(--text-muted);font-weight:500}
 .data-card-icon{width:36px;height:36px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center}
@@ -74,28 +74,28 @@ body{display:flex}
 .data-card-bar{margin-top:10px;height:4px;background:var(--bg-surface);border-radius:2px;overflow:hidden}
 .data-card-bar-fill{height:100%;border-radius:2px;transition:width .5s ease}
 
-.section{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px}
+.section{background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
 .section-title{font-size:15px;font-weight:600}
 .chart-container{width:100%;height:280px}
 .chart-container-lg{width:100%;height:360px}
 
 .btn{padding:6px 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg-surface);color:var(--text-secondary);font-size:13px;cursor:pointer;transition:all var(--transition);font-family:var(--font-ui);display:inline-flex;align-items:center;gap:6px}
-.btn:hover{background:var(--bg-card-hover);color:var(--text-primary);border-color:var(--border-light)}
-.btn-primary{background:var(--accent-green);color:#000;border-color:var(--accent-green);font-weight:600}
-.btn-primary:hover{background:#16a34a}
+.btn:hover{background:#fff7ed;color:var(--accent-orange);border-color:var(--accent-orange)}
+.btn-primary{background:var(--accent-orange);color:#fff;border-color:var(--accent-orange);font-weight:600}
+.btn-primary:hover{background:#d97706}
 .btn-cta{background:var(--accent-orange);color:#000;border-color:var(--accent-orange);font-weight:700;padding:10px 24px;font-size:15px;border-radius:var(--radius-lg)}
 .btn-cta:hover{background:#d97706}
 .btn i{width:14px;height:14px}
 .tabs{display:flex;gap:4px;background:var(--bg-surface);padding:3px;border-radius:var(--radius)}
 .tab{padding:6px 14px;border-radius:6px;font-size:13px;color:var(--text-muted);cursor:pointer;transition:all var(--transition)}
-.tab.active{background:var(--bg-card);color:var(--text-primary)}
+.tab.active{background:#fff;color:var(--accent-orange);font-weight:600}
 .tab:hover:not(.active){color:var(--text-secondary)}
 
 .data-table{width:100%;border-collapse:collapse}
 .data-table th{text-align:left;padding:10px 14px;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);background:var(--bg-surface)}
 .data-table td{padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border);color:var(--text-secondary)}
-.data-table tr:hover td{background:rgba(255,255,255,.02)}
+.data-table tr:hover td{background:#fff7ed}
 .data-table .mono{font-family:var(--font-data);font-size:12px}
 
 .badge{padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500;display:inline-flex;align-items:center;gap:4px}
@@ -127,7 +127,7 @@ body{display:flex}
 
 .pond-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .pond-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;cursor:pointer;transition:all var(--transition)}
-.pond-card:hover{border-color:var(--accent-cyan);transform:translateY(-2px)}
+.pond-card:hover{border-color:var(--accent-orange);transform:translateY(-2px)}
 .pond-card-title{font-size:15px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px}
 .pond-card-meta{font-size:12px;color:var(--text-muted);margin-bottom:12px}
 .pond-card-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
@@ -137,8 +137,8 @@ body{display:flex}
 
 .robot-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;display:flex;align-items:center;gap:16px;transition:all var(--transition)}
 .robot-card:hover{border-color:var(--border-light)}
-.robot-avatar{width:56px;height:56px;border-radius:var(--radius-lg);background:var(--accent-cyan-dim);display:flex;align-items:center;justify-content:center}
-.robot-avatar i{width:28px;height:28px;color:var(--accent-cyan)}
+.robot-avatar{width:56px;height:56px;border-radius:var(--radius-lg);background:var(--accent-orange-dim);display:flex;align-items:center;justify-content:center}
+.robot-avatar i{width:28px;height:28px;color:var(--accent-orange)}
 .robot-info{flex:1}
 .robot-name{font-size:15px;font-weight:600;margin-bottom:4px}
 .robot-desc{font-size:12px;color:var(--text-muted)}
@@ -151,18 +151,18 @@ body{display:flex}
 .form-group{margin-bottom:16px}
 .form-label{font-size:13px;color:var(--text-secondary);margin-bottom:6px;display:block;font-weight:500}
 .form-input{width:100%;padding:8px 12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:14px;font-family:var(--font-ui);transition:border-color var(--transition)}
-.form-input:focus{outline:none;border-color:var(--accent-green)}
+.form-input:focus{outline:none;border-color:var(--accent-orange)}
 select.form-input{cursor:pointer}
 
-.wqi-ring{width:100px;height:100px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;border:3px solid var(--accent-green);margin:0 auto 8px}
-.wqi-score{font-family:var(--font-data);font-size:28px;font-weight:700;color:var(--accent-green)}
+.wqi-ring{width:100px;height:100px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;border:3px solid var(--accent-orange);margin:0 auto 8px}
+.wqi-score{font-family:var(--font-data);font-size:28px;font-weight:700;color:var(--accent-orange)}
 .heatmap-legend{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted)}
-.heatmap-bar{width:120px;height:10px;border-radius:5px;background:linear-gradient(90deg,#22c55e,#eab308,#ef4444)}
+.heatmap-bar{width:120px;height:10px;border-radius:5px;background:linear-gradient(90deg,#f59e0b,#ef4444)}
 
 /* Hero section */
 .hero-section{min-height:calc(100vh - var(--header-h));display:flex;align-items:center;justify-content:center;padding:40px 24px;text-align:center}
 .hero-title{font-size:56px;font-weight:800;line-height:1.1;margin-bottom:16px;letter-spacing:-1px}
-.hero-title .accent{color:var(--accent-cyan)}
+.hero-title .accent{color:var(--accent-orange)}
 .hero-subtitle{font-size:18px;color:var(--text-secondary);max-width:600px;margin:0 auto 32px;line-height:1.7}
 .hero-actions{display:flex;gap:12px;justify-content:center;margin-bottom:48px;flex-wrap:wrap}
 .hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:700px;margin:0 auto}
@@ -171,7 +171,7 @@ select.form-input{cursor:pointer}
 .hero-stat-label{font-size:13px;color:var(--text-muted)}
 
 /* Glass card (from file1) */
-.glass-card{background:rgba(17,24,39,.85);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;transition:all var(--transition)}
+.glass-card{background:rgba(255,255,255,.90);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;transition:all var(--transition)}
 .glass-card:hover{border-color:var(--border-light)}
 
 /* Footer */
@@ -179,7 +179,7 @@ select.form-input{cursor:pointer}
 .footer-inner{max-width:1000px;margin:0 auto}
 .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px;margin-bottom:32px}
 .footer-brand{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.footer-brand svg{width:24px;height:24px;color:var(--accent-cyan)}
+.footer-brand svg{width:24px;height:24px;color:var(--accent-orange)}
 .footer-brand span{font-size:15px;font-weight:600}
 .footer-desc{font-size:13px;color:var(--text-muted);line-height:1.6}
 .footer-col-title{font-size:14px;font-weight:600;margin-bottom:12px}
@@ -195,7 +195,7 @@ select.form-input{cursor:pointer}
 /* Report cards */
 .report-card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
 .report-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;cursor:pointer;transition:all var(--transition)}
-.report-card:hover{border-color:var(--accent-cyan);transform:translateY(-2px)}
+.report-card:hover{border-color:var(--accent-orange);transform:translateY(-2px)}
 .report-card-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
 .report-card-icon{width:44px;height:44px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center}
 .report-card-icon i{width:22px;height:22px}
@@ -203,7 +203,7 @@ select.form-input{cursor:pointer}
 .report-card-desc{font-size:12px;color:var(--text-muted)}
 .report-card-footer{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-muted);margin-top:12px}
 
-::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--border-light)}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:#f3f4f6}::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--border-light)}
 
 @media(max-width:1200px){.cards-4{grid-template-columns:repeat(2,1fr)}.pond-grid{grid-template-columns:repeat(2,1fr)}.twin-container{grid-template-columns:1fr}.twin-sidebar{flex-direction:row;overflow-x:auto}.hero-stats{grid-template-columns:repeat(2,1fr)}.footer-grid{grid-template-columns:1fr 1fr}.report-card-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:768px){.sidebar{width:60px}.sidebar-logo span,.nav-item span,.nav-group-label{display:none}.nav-item{justify-content:center;padding:12px}.main{margin-left:60px}.cards-4,.cards-3{grid-template-columns:1fr}.pond-grid,.report-card-grid{grid-template-columns:1fr}.hero-title{font-size:36px}.hero-stats{grid-template-columns:1fr 1fr}.footer-grid{grid-template-columns:1fr}}
@@ -263,9 +263,9 @@ select.form-input{cursor:pointer}
             <button class="btn" style="padding:12px 28px;font-size:15px;" onclick="switchPage('twin')"><i data-lucide="box"></i> 数字孪生演示</button>
           </div>
           <div class="hero-stats">
-            <div class="hero-stat"><div class="hero-stat-val" style="color:var(--accent-green)">12+</div><div class="hero-stat-label">监测参数</div></div>
+            <div class="hero-stat"><div class="hero-stat-val" style="color:var(--accent-orange)">12+</div><div class="hero-stat-label">监测参数</div></div>
             <div class="hero-stat"><div class="hero-stat-val" style="color:var(--accent-orange)">99.9%</div><div class="hero-stat-label">数据准确率</div></div>
-            <div class="hero-stat"><div class="hero-stat-val" style="color:var(--accent-cyan)">24/7</div><div class="hero-stat-label">实时监控</div></div>
+            <div class="hero-stat"><div class="hero-stat-val" style="color:var(--accent-orange)">24/7</div><div class="hero-stat-label">实时监控</div></div>
             <div class="hero-stat"><div class="hero-stat-val" style="color:var(--accent-purple)">3D</div><div class="hero-stat-label">数字孪生</div></div>
           </div>
         </div>
@@ -445,7 +445,7 @@ function updateClock(){var now=new Date();document.getElementById("headerTime").
 setInterval(updateClock,1000);updateClock();
 function renderSensorCards(){
   var c=document.getElementById("sensorCards");
-  var cols={normal:"var(--accent-green)",warning:"var(--accent-orange)",danger:"var(--accent-red)"};
+  var cols={normal:"var(--accent-orange)",warning:"var(--accent-orange)",danger:"var(--accent-red)"};
   var bg={normal:"var(--accent-green-dim)",warning:"var(--accent-orange-dim)",danger:"var(--accent-red-dim)"};
   var ics={normal:"check-circle",warning:"alert-circle",danger:"x-circle"};
   var stx={normal:"正常",warning:"偏高",danger:"异常"};
@@ -499,7 +499,7 @@ function renderRobots(){
   ];
   var html="";
   robots.forEach(function(r){
-    html+="<div class=\"robot-card\"><div class=\"robot-avatar\"><i data-lucide=\"bot\"></i></div><div class=\"robot-info\"><div class=\"robot-name\">"+r.name+" <span class=\"badge badge-"+(r.status==="巡航中"?"green":"blue")+"\" style=\"margin-left:8px\">"+r.status+"</span></div><div class=\"robot-desc\">任务: "+r.task+" · 位置: "+r.pond+" · 速度: "+r.speed+"</div></div><div class=\"robot-stats\"><div class=\"robot-stat\"><div class=\"robot-stat-val\" style=\"color:"+(r.battery>50?"var(--accent-green)":"var(--accent-orange)")+"\">"+r.battery+"%</div><div class=\"robot-stat-label\">电量</div></div></div></div>";
+    html+="<div class=\"robot-card\"><div class=\"robot-avatar\"><i data-lucide=\"bot\"></i></div><div class=\"robot-info\"><div class=\"robot-name\">"+r.name+" <span class=\"badge badge-"+(r.status==="巡航中"?"green":"blue")+"\" style=\"margin-left:8px\">"+r.status+"</span></div><div class=\"robot-desc\">任务: "+r.task+" · 位置: "+r.pond+" · 速度: "+r.speed+"</div></div><div class=\"robot-stats\"><div class=\"robot-stat\"><div class=\"robot-stat-val\" style=\"color:"+(r.battery>50?"var(--accent-orange)":"var(--accent-red)")+"\">"+r.battery+"%</div><div class=\"robot-stat-label\">电量</div></div></div></div>";
   });
   document.getElementById("robotList").innerHTML=html;
   var tasks=[
@@ -546,16 +546,16 @@ function renderTwinSensors(){
 }// ===== ECharts =====
 function initCharts(){
   var doChart=echarts.init(document.getElementById("chartDoTrend"));
-  doChart.setOption({backgroundColor:"transparent",grid:{left:50,right:20,top:20,bottom:30},xAxis:{type:"category",data:H.labels,axisLine:{lineStyle:{color:"#1e293b"}},axisLabel:{color:"#64748b",fontSize:11},axisTick:{show:false}},yAxis:{type:"value",min:4,max:10,splitLine:{lineStyle:{color:"#1e293b"}},axisLabel:{color:"#64748b",fontSize:11},axisLine:{show:false}},series:[{type:"line",data:H.do,smooth:true,symbol:"none",lineStyle:{color:"#22c55e",width:2},areaStyle:{color:{type:"linear",x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:"rgba(34,197,94,.25)"},{offset:1,color:"rgba(34,197,94,0)"}]}},markLine:{silent:true,lineStyle:{color:"#ef4444",type:"dashed"},data:[{yAxis:5,label:{formatter:"安全线 5.0",color:"#ef4444",fontSize:11}}]}}],tooltip:{trigger:"axis",backgroundColor:"#1e293b",borderColor:"#334155",textStyle:{color:"#f1f5f9",fontSize:12}}});
+  doChart.setOption({backgroundColor:"transparent",grid:{left:50,right:20,top:20,bottom:30},xAxis:{type:"category",data:H.labels,axisLine:{lineStyle:{color:"#e5e7eb"}},axisLabel:{color:"#9ca3af",fontSize:11},axisTick:{show:false}},yAxis:{type:"value",min:4,max:10,splitLine:{lineStyle:{color:"#f3f4f6"}},axisLabel:{color:"#9ca3af",fontSize:11},axisLine:{show:false}},series:[{type:"line",data:H.do,smooth:true,symbol:"none",lineStyle:{color:"#f59e0b",width:2},areaStyle:{color:{type:"linear",x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:"rgba(245,158,11,.20)"},{offset:1,color:"rgba(245,158,11,0)"}]}},markLine:{silent:true,lineStyle:{color:"#ef4444",type:"dashed"},data:[{yAxis:5,label:{formatter:"安全线 5.0",color:"#ef4444",fontSize:11}}]}}],tooltip:{trigger:"axis",backgroundColor:"#fff",borderColor:"#e5e7eb",textStyle:{color:"#1a1a2e",fontSize:12}}});
   var radarChart=echarts.init(document.getElementById("chartRadar"));
-  radarChart.setOption({backgroundColor:"transparent",radar:{indicator:[{name:"溶氧",max:10},{name:"pH",max:14},{name:"水温",max:40},{name:"氨氮",max:0.5},{name:"浊度",max:50}],axisName:{color:"#94a3b8",fontSize:12},splitArea:{areaStyle:{color:["rgba(30,41,59,.3)","rgba(30,41,59,.15)"]}},axisLine:{lineStyle:{color:"#1e293b"}},splitLine:{lineStyle:{color:"#1e293b"}}},series:[{type:"radar",data:[{value:[7.2,7.4,26.3,0.08,12.5],name:"当前值",areaStyle:{color:"rgba(34,197,94,.15)"},lineStyle:{color:"#22c55e"},itemStyle:{color:"#22c55e"}}]}],tooltip:{backgroundColor:"#1e293b",borderColor:"#334155",textStyle:{color:"#f1f5f9"}}});
+  radarChart.setOption({backgroundColor:"transparent",radar:{indicator:[{name:"溶氧",max:10},{name:"pH",max:14},{name:"水温",max:40},{name:"氨氮",max:0.5},{name:"浊度",max:50}],axisName:{color:"#6b7280",fontSize:12},splitArea:{areaStyle:{color:["rgba(245,158,11,.05)","rgba(245,158,11,.02)"]}},axisLine:{lineStyle:{color:"#e5e7eb"}},splitLine:{lineStyle:{color:"#f3f4f6"}}},series:[{type:"radar",data:[{value:[7.2,7.4,26.3,0.08,12.5],name:"当前值",areaStyle:{color:"rgba(245,158,11,.12)"},lineStyle:{color:"#f59e0b"},itemStyle:{color:"#f59e0b"}}]}],tooltip:{backgroundColor:"#fff",borderColor:"#e5e7eb",textStyle:{color:"#1a1a2e"}}});
   var barChart=echarts.init(document.getElementById("chartPondBar"));
-  barChart.setOption({backgroundColor:"transparent",grid:{left:60,right:20,top:10,bottom:30},xAxis:{type:"category",data:["1号塘","2号塘","3号塘","4号塘","5号塘","6号塘"],axisLine:{lineStyle:{color:"#1e293b"}},axisLabel:{color:"#64748b"},axisTick:{show:false}},yAxis:{type:"value",name:"溶氧 mg/L",nameTextStyle:{color:"#64748b"},splitLine:{lineStyle:{color:"#1e293b"}},axisLabel:{color:"#64748b"},axisLine:{show:false}},series:[{type:"bar",barWidth:28,data:[{value:7.2,itemStyle:{color:"#22c55e"}},{value:6.8,itemStyle:{color:"#22c55e"}},{value:4.2,itemStyle:{color:"#ef4444"}},{value:7.5,itemStyle:{color:"#22c55e"}},{value:6.1,itemStyle:{color:"#f59e0b"}},{value:7.8,itemStyle:{color:"#22c55e"}}],markLine:{silent:true,lineStyle:{color:"#ef4444",type:"dashed"},data:[{yAxis:5}]}}],tooltip:{trigger:"axis",backgroundColor:"#1e293b",borderColor:"#334155",textStyle:{color:"#f1f5f9"}}});
+  barChart.setOption({backgroundColor:"transparent",grid:{left:60,right:20,top:10,bottom:30},xAxis:{type:"category",data:["1号塘","2号塘","3号塘","4号塘","5号塘","6号塘"],axisLine:{lineStyle:{color:"#e5e7eb"}},axisLabel:{color:"#9ca3af"},axisTick:{show:false}},yAxis:{type:"value",name:"溶氧 mg/L",nameTextStyle:{color:"#64748b"},splitLine:{lineStyle:{color:"#f3f4f6"}},axisLabel:{color:"#9ca3af"},axisLine:{show:false}},series:[{type:"bar",barWidth:28,data:[{value:7.2,itemStyle:{color:"#f59e0b"}},{value:6.8,itemStyle:{color:"#f59e0b"}},{value:4.2,itemStyle:{color:"#ef4444"}},{value:7.5,itemStyle:{color:"#f59e0b"}},{value:6.1,itemStyle:{color:"#f59e0b"}},{value:7.8,itemStyle:{color:"#f59e0b"}}],markLine:{silent:true,lineStyle:{color:"#ef4444",type:"dashed"},data:[{yAxis:5}]}}],tooltip:{trigger:"axis",backgroundColor:"#fff",borderColor:"#e5e7eb",textStyle:{color:"#1a1a2e"}}});
   var multiChart=echarts.init(document.getElementById("chartMultiTrend"));
-  multiChart.setOption({backgroundColor:"transparent",grid:{left:50,right:50,top:30,bottom:30},legend:{data:["溶氧","水温","pH"],textStyle:{color:"#94a3b8",fontSize:12},top:0},xAxis:{type:"category",data:H.labels,axisLine:{lineStyle:{color:"#1e293b"}},axisLabel:{color:"#64748b",fontSize:11},axisTick:{show:false}},yAxis:[{type:"value",name:"mg/L / pH",splitLine:{lineStyle:{color:"#1e293b"}},axisLabel:{color:"#64748b"},axisLine:{show:false}},{type:"value",name:"°C",splitLine:{show:false},axisLabel:{color:"#64748b"},axisLine:{show:false}}],series:[{name:"溶氧",type:"line",data:H.do,smooth:true,symbol:"none",lineStyle:{color:"#22c55e",width:2},itemStyle:{color:"#22c55e"}},{name:"pH",type:"line",data:H.ph,smooth:true,symbol:"none",lineStyle:{color:"#a78bfa",width:2},itemStyle:{color:"#a78bfa"}},{name:"水温",type:"line",yAxisIndex:1,data:H.temp,smooth:true,symbol:"none",lineStyle:{color:"#f59e0b",width:2},itemStyle:{color:"#f59e0b"}}],tooltip:{trigger:"axis",backgroundColor:"#1e293b",borderColor:"#334155",textStyle:{color:"#f1f5f9",fontSize:12}}});
+  multiChart.setOption({backgroundColor:"transparent",grid:{left:50,right:50,top:30,bottom:30},legend:{data:["溶氧","水温","pH"],textStyle:{color:"#6b7280",fontSize:12},top:0},xAxis:{type:"category",data:H.labels,axisLine:{lineStyle:{color:"#e5e7eb"}},axisLabel:{color:"#9ca3af",fontSize:11},axisTick:{show:false}},yAxis:[{type:"value",name:"mg/L / pH",splitLine:{lineStyle:{color:"#f3f4f6"}},axisLabel:{color:"#9ca3af"},axisLine:{show:false}},{type:"value",name:"°C",splitLine:{show:false},axisLabel:{color:"#9ca3af"},axisLine:{show:false}}],series:[{name:"溶氧",type:"line",data:H.do,smooth:true,symbol:"none",lineStyle:{color:"#f59e0b",width:2},itemStyle:{color:"#f59e0b"}},{name:"pH",type:"line",data:H.ph,smooth:true,symbol:"none",lineStyle:{color:"#a78bfa",width:2},itemStyle:{color:"#a78bfa"}},{name:"水温",type:"line",yAxisIndex:1,data:H.temp,smooth:true,symbol:"none",lineStyle:{color:"#f59e0b",width:2},itemStyle:{color:"#f59e0b"}}],tooltip:{trigger:"axis",backgroundColor:"#fff",borderColor:"#e5e7eb",textStyle:{color:"#1a1a2e",fontSize:12}}});
   var robotChart=echarts.init(document.getElementById("chartRobot"));
   var rh=[];for(var i=0;i<12;i++)rh.push((8+i)+":00");
-  robotChart.setOption({backgroundColor:"transparent",grid:{left:50,right:50,top:30,bottom:30},legend:{data:["AquaBot-01","AquaBot-02","AquaBot-03"],textStyle:{color:"#94a3b8",fontSize:12},top:0},xAxis:{type:"category",data:rh,axisLine:{lineStyle:{color:"#1e293b"}},axisLabel:{color:"#64748b"},axisTick:{show:false}},yAxis:{type:"value",max:100,name:"电量 %",nameTextStyle:{color:"#64748b"},splitLine:{lineStyle:{color:"#1e293b"}},axisLabel:{color:"#64748b"},axisLine:{show:false}},series:[{name:"AquaBot-01",type:"line",data:[100,95,88,82,78,75,70,65,60,55,50,45],smooth:true,symbol:"none",lineStyle:{color:"#22d3ee",width:2},itemStyle:{color:"#22d3ee"}},{name:"AquaBot-02",type:"line",data:[20,25,30,35,40,50,60,70,80,85,90,95],smooth:true,symbol:"none",lineStyle:{color:"#a78bfa",width:2},itemStyle:{color:"#a78bfa"}},{name:"AquaBot-03",type:"line",data:[100,98,96,94,92,90,88,86,84,82,80,78],smooth:true,symbol:"none",lineStyle:{color:"#22c55e",width:2},itemStyle:{color:"#22c55e"}}],tooltip:{trigger:"axis",backgroundColor:"#1e293b",borderColor:"#334155",textStyle:{color:"#f1f5f9"}}});
+  robotChart.setOption({backgroundColor:"transparent",grid:{left:50,right:50,top:30,bottom:30},legend:{data:["AquaBot-01","AquaBot-02","AquaBot-03"],textStyle:{color:"#6b7280",fontSize:12},top:0},xAxis:{type:"category",data:rh,axisLine:{lineStyle:{color:"#e5e7eb"}},axisLabel:{color:"#9ca3af"},axisTick:{show:false}},yAxis:{type:"value",max:100,name:"电量 %",nameTextStyle:{color:"#64748b"},splitLine:{lineStyle:{color:"#f3f4f6"}},axisLabel:{color:"#9ca3af"},axisLine:{show:false}},series:[{name:"AquaBot-01",type:"line",data:[100,95,88,82,78,75,70,65,60,55,50,45],smooth:true,symbol:"none",lineStyle:{color:"#f59e0b",width:2},itemStyle:{color:"#f59e0b"}},{name:"AquaBot-02",type:"line",data:[20,25,30,35,40,50,60,70,80,85,90,95],smooth:true,symbol:"none",lineStyle:{color:"#a78bfa",width:2},itemStyle:{color:"#a78bfa"}},{name:"AquaBot-03",type:"line",data:[100,98,96,94,92,90,88,86,84,82,80,78],smooth:true,symbol:"none",lineStyle:{color:"#f59e0b",width:2},itemStyle:{color:"#f59e0b"}}],tooltip:{trigger:"axis",backgroundColor:"#fff",borderColor:"#e5e7eb",textStyle:{color:"#1a1a2e"}}});
   renderTwinSensors();
   window.addEventListener("resize",function(){doChart.resize();radarChart.resize();barChart.resize();multiChart.resize();robotChart.resize();});
   window._charts={doChart:doChart,radarChart:radarChart,barChart:barChart,multiChart:multiChart,robotChart:robotChart};
@@ -577,8 +577,8 @@ function initThreeScene(){
     }
     console.log("[Twin] init",W,"x",Ht);
     var scene=new THREE.Scene();
-    scene.background=new THREE.Color(0x070b14);
-    scene.fog=new THREE.FogExp2(0x070b14,0.015);
+    scene.background=new THREE.Color(0xf0f4f8);
+    scene.fog=new THREE.FogExp2(0xf0f4f8,0.012);
     var camera=new THREE.PerspectiveCamera(50,W/Ht,0.1,200);
     camera.position.set(18,14,18);camera.lookAt(0,0,0);
     var renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true});
@@ -586,32 +586,32 @@ function initThreeScene(){
     var controls=new THREE.OrbitControls(camera,renderer.domElement);
     controls.enableDamping=true;controls.dampingFactor=0.05;
     controls.maxPolarAngle=Math.PI/2.2;controls.minDistance=8;controls.maxDistance=40;
-    scene.add(new THREE.AmbientLight(0x4488aa,0.6));
+    scene.add(new THREE.AmbientLight(0xffffff,0.7));
     var dl=new THREE.DirectionalLight(0xffffff,0.8);dl.position.set(10,20,10);scene.add(dl);
-    var pl=new THREE.PointLight(0x22d3ee,0.5,30);pl.position.set(0,5,0);scene.add(pl);
-    var gnd=new THREE.Mesh(new THREE.PlaneGeometry(60,60),new THREE.MeshStandardMaterial({color:0x1a2a1a,roughness:0.9}));
+    var pl=new THREE.PointLight(0xffcc80,0.4,30);pl.position.set(0,5,0);scene.add(pl);
+    var gnd=new THREE.Mesh(new THREE.PlaneGeometry(60,60),new THREE.MeshStandardMaterial({color:0x8bc34a,roughness:0.8}));
     gnd.rotation.x=-Math.PI/2;gnd.position.y=-0.5;scene.add(gnd);
     var sh=new THREE.Shape();sh.moveTo(-12,-8);sh.lineTo(12,-8);sh.lineTo(12,8);sh.lineTo(-12,8);sh.lineTo(-12,-8);
     var hole=new THREE.Path();hole.moveTo(-10,-6);hole.lineTo(10,-6);hole.lineTo(10,6);hole.lineTo(-10,6);hole.lineTo(-10,-6);
     sh.holes.push(hole);
-    var shore=new THREE.Mesh(new THREE.ShapeGeometry(sh),new THREE.MeshStandardMaterial({color:0x3d2b1f,roughness:1}));
+    var shore=new THREE.Mesh(new THREE.ShapeGeometry(sh),new THREE.MeshStandardMaterial({color:0xd7ccc8,roughness:0.9}));
     shore.rotation.x=-Math.PI/2;shore.position.y=-0.3;scene.add(shore);
     var waterGeo=new THREE.PlaneGeometry(20,12,80,48);
-    var waterMat=new THREE.MeshPhongMaterial({color:0x0c4a6e,transparent:true,opacity:0.85,shininess:100,specular:0x22d3ee,side:THREE.DoubleSide});
+    var waterMat=new THREE.MeshPhongMaterial({color:0x4fc3f7,transparent:true,opacity:0.75,shininess:80,specular:0xffffff,side:THREE.DoubleSide});
     var water=new THREE.Mesh(waterGeo,waterMat);water.rotation.x=-Math.PI/2;water.position.y=0;scene.add(water);
     var heatGroup=new THREE.Group();scene.add(heatGroup);var hps=[];
-    for(var x=-9;x<=9;x+=1.5){for(var z=-5;z<=5;z+=1.5){var v=Math.random();var c=new THREE.Color().setHSL(0.35-v*0.35,0.8,0.4+v*0.2);var sp=new THREE.Mesh(new THREE.SphereGeometry(0.2,8,8),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:0.6}));sp.position.set(x,0.3,z);heatGroup.add(sp);hps.push({m:sp,b:v});}}
+    for(var x=-9;x<=9;x+=1.5){for(var z=-5;z<=5;z+=1.5){var v=Math.random();var c=new THREE.Color().setHSL(0.08-v*0.08,0.9,0.5+v*0.2);var sp=new THREE.Mesh(new THREE.SphereGeometry(0.2,8,8),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:0.6}));sp.position.set(x,0.3,z);heatGroup.add(sp);hps.push({m:sp,b:v});}}
     var senGroup=new THREE.Group();scene.add(senGroup);
-    [{x:-5,z:-3},{x:3,z:-2},{x:-2,z:3},{x:6,z:2}].forEach(function(s){var mk=new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.15,1.5,8),new THREE.MeshStandardMaterial({color:0x22d3ee,emissive:0x22d3ee,emissiveIntensity:0.3}));mk.position.set(s.x,0.75,s.z);senGroup.add(mk);var tp=new THREE.Mesh(new THREE.SphereGeometry(0.2,8,8),new THREE.MeshBasicMaterial({color:0x22d3ee}));tp.position.set(s.x,1.5,s.z);senGroup.add(tp);});
+    [{x:-5,z:-3},{x:3,z:-2},{x:-2,z:3},{x:6,z:2}].forEach(function(s){var mk=new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.15,1.5,8),new THREE.MeshStandardMaterial({color:0xf59e0b,emissive:0xf59e0b,emissiveIntensity:0.3}));mk.position.set(s.x,0.75,s.z);senGroup.add(mk);var tp=new THREE.Mesh(new THREE.SphereGeometry(0.2,8,8),new THREE.MeshBasicMaterial({color:0xf59e0b}));tp.position.set(s.x,1.5,s.z);senGroup.add(tp);});
     var rbt=new THREE.Group();
-    rbt.add(new THREE.Mesh(new THREE.BoxGeometry(1,0.4,0.6),new THREE.MeshStandardMaterial({color:0x22c55e,emissive:0x22c55e,emissiveIntensity:0.2})));
-    var cn=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.3,0.4),new THREE.MeshStandardMaterial({color:0x16a34a}));cn.position.y=0.35;rbt.add(cn);
+    rbt.add(new THREE.Mesh(new THREE.BoxGeometry(1,0.4,0.6),new THREE.MeshStandardMaterial({color:0xf59e0b,emissive:0xf59e0b,emissiveIntensity:0.2})));
+    var cn=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.3,0.4),new THREE.MeshStandardMaterial({color:0xe65100}));cn.position.y=0.35;rbt.add(cn);
     var nz=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,0.4,8),new THREE.MeshStandardMaterial({color:0x94a3b8}));nz.position.set(0.4,0.4,0);rbt.add(nz);
     rbt.position.y=0.3;scene.add(rbt);
     var pathGroup=new THREE.Group();scene.add(pathGroup);var pp=[];
     for(var t=0;t<Math.PI*2;t+=0.05)pp.push(new THREE.Vector3(Math.cos(t)*7+Math.sin(t*2)*1.5,0.15,Math.sin(t)*4+Math.cos(t*3)*0.8));
     var pathCurve=new THREE.CatmullRomCurve3(pp,true);
-    pathGroup.add(new THREE.Mesh(new THREE.TubeGeometry(pathCurve,200,0.03,4,true),new THREE.MeshBasicMaterial({color:0x22c55e,transparent:true,opacity:0.3})));
+    pathGroup.add(new THREE.Mesh(new THREE.TubeGeometry(pathCurve,200,0.03,4,true),new THREE.MeshBasicMaterial({color:0xf59e0b,transparent:true,opacity:0.25})));
     document.getElementById("btnHeatmap").addEventListener("click",function(){showHeatmap=!showHeatmap;});
     document.getElementById("btnPath").addEventListener("click",function(){showPath=!showPath;});
     document.getElementById("btnSensor").addEventListener("click",function(){showSensor=!showSensor;});
@@ -623,7 +623,7 @@ function initThreeScene(){
       var pos=waterGeo.attributes.position;
       for(var i=0;i<pos.count;i++){var px=pos.getX(i),pz=pos.getZ(i);pos.setY(i,Math.sin(px*0.5+t*1.5)*0.08+Math.cos(pz*0.8+t*1.2)*0.06);}
       pos.needsUpdate=true;waterGeo.computeVertexNormals();
-      hps.forEach(function(p,idx){var v=p.b+Math.sin(t*0.5+idx)*0.1;v=Math.max(0,Math.min(1,v));p.m.material.color.setHSL(0.35-v*0.35,0.8,0.4+v*0.2);p.m.position.y=0.3+Math.sin(t+idx*0.3)*0.05;});
+      hps.forEach(function(p,idx){var v=p.b+Math.sin(t*0.5+idx)*0.1;v=Math.max(0,Math.min(1,v));p.m.material.color.setHSL(0.08-v*0.08,0.9,0.5+v*0.2);p.m.position.y=0.3+Math.sin(t+idx*0.3)*0.05;});
       heatGroup.visible=showHeatmap;senGroup.visible=showSensor;pathGroup.visible=showPath;
       robotAngle+=0.002;var rp=pathCurve.getPointAt(robotAngle%1);var la=pathCurve.getPointAt((robotAngle+0.01)%1);
       rbt.position.x=rp.x;rbt.position.z=rp.z;rbt.lookAt(la.x,rbt.position.y,la.z);rbt.position.y=0.3+Math.sin(t*3)*0.03;
