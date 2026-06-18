@@ -319,7 +319,7 @@ select.form-input{cursor:pointer}
     <!-- Page: 鱼塘管理 -->
     <div class="page" id="page-ponds">
       <div class="section" style="margin-bottom:20px;">
-        <div class="section-header"><span class="section-title">鱼塘列表</span><button class="btn btn-primary"><i data-lucide="plus"></i> 新增鱼塘</button></div>
+        <div class="section-header"><span class="section-title">鱼塘列表</span><button class="btn btn-primary" id="btnAddPond"><i data-lucide="plus"></i> 新增鱼塘</button></div>
       </div>
       <div class="pond-grid" id="pondGrid"></div>
     </div>
@@ -476,15 +476,16 @@ function renderAlerts(){
   var lbc={danger:"red",warning:"orange",info:"blue"};var lt={danger:"严重",warning:"预警",info:"信息"};var sbc={"处理中":"orange","已通知":"blue","已处理":"green","监控中":"blue","已恢复":"green"};
   var thtml="";rows.forEach(function(r){thtml+="<tr><td class=\"mono\">"+r.time+"</td><td>"+r.pond+"</td><td>"+r.type+"</td><td><span class=\"badge badge-"+lbc[r.level]+"\">"+lt[r.level]+"</span></td><td><span class=\"badge badge-"+sbc[r.status]+"\">"+r.status+"</span></td></tr>";});
   document.getElementById("alertTable").innerHTML=thtml;lucide.createIcons();
-}function renderPondGrid(){
-  var ponds=[
-    {name:"1号鱼塘",area:"1200",depth:"2.5",species:"鲈鱼",density:"800尾/亩",do:7.2,temp:26.3,status:"normal"},
-    {name:"2号鱼塘",area:"800",depth:"2.0",species:"草鱼",density:"1200尾/亩",do:6.8,temp:25.8,status:"warning"},
-    {name:"3号鱼塘",area:"1500",depth:"3.0",species:"鲈鱼",density:"600尾/亩",do:4.2,temp:27.1,status:"danger"},
-    {name:"4号鱼塘",area:"600",depth:"1.8",species:"鲫鱼",density:"1500尾/亩",do:7.5,temp:24.9,status:"normal"},
-    {name:"5号鱼塘",area:"1000",depth:"2.2",species:"鲈鱼",density:"900尾/亩",do:6.1,temp:30.2,status:"warning"},
-    {name:"6号鱼塘",area:"900",depth:"2.0",species:"鲤鱼",density:"1000尾/亩",do:7.8,temp:25.5,status:"normal"}
-  ];
+}var pondsData=[
+  {name:"1号鱼塘",area:"1200",depth:"2.5",species:"鲈鱼",density:"800尾/亩",do:7.2,temp:26.3,status:"normal"},
+  {name:"2号鱼塘",area:"800",depth:"2.0",species:"草鱼",density:"1200尾/亩",do:6.8,temp:25.8,status:"warning"},
+  {name:"3号鱼塘",area:"1500",depth:"3.0",species:"鲈鱼",density:"600尾/亩",do:4.2,temp:27.1,status:"danger"},
+  {name:"4号鱼塘",area:"600",depth:"1.8",species:"鲫鱼",density:"1500尾/亩",do:7.5,temp:24.9,status:"normal"},
+  {name:"5号鱼塘",area:"1000",depth:"2.2",species:"鲈鱼",density:"900尾/亩",do:6.1,temp:30.2,status:"warning"},
+  {name:"6号鱼塘",area:"900",depth:"2.0",species:"鲤鱼",density:"1000尾/亩",do:7.8,temp:25.5,status:"normal"}
+];
+function renderPondGrid(){
+  var ponds=pondsData;
   var sc={normal:"green",warning:"orange",danger:"red"};
   var st={normal:"健康",warning:"预警",danger:"异常"};
   var html="";
@@ -530,6 +531,63 @@ function renderReports(){
   });
   document.getElementById("reportTable").innerHTML=html;lucide.createIcons();
 }
+// ===== 新增鱼塘弹窗 =====
+(function(){
+  var modal=document.getElementById("pondModal");
+  var openBtn=document.getElementById("btnAddPond");
+  var closeBtn=document.getElementById("pondModalClose");
+  var cancelBtn=document.getElementById("pondModalCancel");
+  var submitBtn=document.getElementById("pondModalSubmit");
+
+  function showModal(){modal.style.display="flex";}
+  function hideModal(){modal.style.display="none";}
+
+  openBtn.addEventListener("click",showModal);
+  closeBtn.addEventListener("click",hideModal);
+  cancelBtn.addEventListener("click",hideModal);
+  modal.addEventListener("click",function(e){if(e.target===modal)hideModal();});
+
+  submitBtn.addEventListener("click",function(){
+    var name=document.getElementById("pondName").value.trim();
+    var area=document.getElementById("pondArea").value.trim();
+    var depth=document.getElementById("pondDepth").value.trim();
+    var species=document.getElementById("pondSpecies").value;
+    var density=document.getElementById("pondDensity").value.trim();
+
+    if(!name){alert("请输入鱼塘名称");return;}
+    if(!area){alert("请输入面积");return;}
+    if(!depth){alert("请输入水深");return;}
+    if(!density){alert("请输入养殖密度");return;}
+
+    var doVal=+(6+Math.random()*3).toFixed(1);
+    var tempVal=+(22+Math.random()*8).toFixed(1);
+    var status=doVal<5?"danger":doVal<6?"warning":"normal";
+
+    pondsData.push({
+      name:name,area:area,depth:depth,species:species,
+      density:density+"尾/亩",do:doVal,temp:tempVal,status:status
+    });
+
+    renderPondGrid();
+    lucide.createIcons();
+    hideModal();
+
+    // 清空表单
+    document.getElementById("pondName").value="";
+    document.getElementById("pondArea").value="";
+    document.getElementById("pondDepth").value="";
+    document.getElementById("pondDensity").value="";
+
+    // 成功提示
+    var tip=document.createElement("div");
+    tip.textContent="✓ "+name+" 已添加";
+    tip.style.cssText="position:fixed;top:20px;right:20px;background:#16a34a;color:#fff;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.15)";
+    document.body.appendChild(tip);
+    setTimeout(function(){tip.style.opacity="0";tip.style.transition="opacity .5s";},2500);
+    setTimeout(function(){tip.remove();},3000);
+  });
+})();
+
 function exportReport(reportId){
   var r=null;
   for(var i=0;i<reportsData.length;i++){if(reportsData[i].id===reportId){r=reportsData[i];break;}}
@@ -784,5 +842,48 @@ window.addEventListener("DOMContentLoaded",function(){
 });
 
 </script>
+
+<!-- 新增鱼塘弹窗 -->
+<div id="pondModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.45);z-index:9000;justify-content:center;align-items:center">
+  <div style="background:#fff;border-radius:12px;width:420px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)">
+    <div style="padding:20px 24px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center">
+      <h3 style="margin:0;font-size:17px;font-weight:600;color:#1a1a2e">新增鱼塘</h3>
+      <span id="pondModalClose" style="cursor:pointer;font-size:22px;color:#9ca3af;line-height:1">&times;</span>
+    </div>
+    <div style="padding:24px">
+      <div style="margin-bottom:16px">
+        <label style="display:block;font-size:13px;font-weight:500;color:#6b7280;margin-bottom:6px">鱼塘名称</label>
+        <input id="pondName" type="text" placeholder="如：7号鱼塘" style="width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;outline:none;box-sizing:border-box">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div>
+          <label style="display:block;font-size:13px;font-weight:500;color:#6b7280;margin-bottom:6px">面积 (m²)</label>
+          <input id="pondArea" type="number" placeholder="1000" style="width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;outline:none;box-sizing:border-box">
+        </div>
+        <div>
+          <label style="display:block;font-size:13px;font-weight:500;color:#6b7280;margin-bottom:6px">水深 (m)</label>
+          <input id="pondDepth" type="number" step="0.1" placeholder="2.5" style="width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;outline:none;box-sizing:border-box">
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div>
+          <label style="display:block;font-size:13px;font-weight:500;color:#6b7280;margin-bottom:6px">养殖品种</label>
+          <select id="pondSpecies" style="width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;outline:none;box-sizing:border-box;cursor:pointer">
+            <option>鲈鱼</option><option>草鱼</option><option>鲫鱼</option><option>鲤鱼</option><option>鲢鱼</option><option>鳙鱼</option><option>黑鱼</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block;font-size:13px;font-weight:500;color:#6b7280;margin-bottom:6px">养殖密度 (尾/亩)</label>
+          <input id="pondDensity" type="number" placeholder="800" style="width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;outline:none;box-sizing:border-box">
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px">
+        <button id="pondModalCancel" class="btn" style="padding:10px 20px">取消</button>
+        <button id="pondModalSubmit" class="btn btn-primary" style="padding:10px 20px">确认添加</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
