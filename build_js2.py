@@ -1,0 +1,91 @@
+﻿# -*- coding: utf-8 -*-
+import os
+DIR = r'D:\夸克\3'
+OUT = os.path.join(DIR, 'index.html')
+
+js = []
+
+def add(s):
+    js.append(s)
+
+# Pond grid
+add('function renderPondGrid(){')
+add('  var ponds=[')
+add('    {name:"1\u53f7\u9c7c\u5858",area:"1200",depth:"2.5",species:"\u9c88\u9c7c",density:"800\u5c3e/\u4ea9",do:7.2,temp:26.3,status:"normal"},')
+add('    {name:"2\u53f7\u9c7c\u5858",area:"800",depth:"2.0",species:"\u8349\u9c7c",density:"1200\u5c3e/\u4ea9",do:6.8,temp:25.8,status:"warning"},')
+add('    {name:"3\u53f7\u9c7c\u5858",area:"1500",depth:"3.0",species:"\u9c88\u9c7c",density:"600\u5c3e/\u4ea9",do:4.2,temp:27.1,status:"danger"},')
+add('    {name:"4\u53f7\u9c7c\u5858",area:"600",depth:"1.8",species:"\u9cab\u9c7c",density:"1500\u5c3e/\u4ea9",do:7.5,temp:24.9,status:"normal"},')
+add('    {name:"5\u53f7\u9c7c\u5858",area:"1000",depth:"2.2",species:"\u9c88\u9c7c",density:"900\u5c3e/\u4ea9",do:6.1,temp:30.2,status:"warning"},')
+add('    {name:"6\u53f7\u9c7c\u5858",area:"900",depth:"2.0",species:"\u9ca4\u9c7c",density:"1000\u5c3e/\u4ea9",do:7.8,temp:25.5,status:"normal"}')
+add('  ];')
+add('  var sc={normal:"green",warning:"orange",danger:"red"};')
+add('  var st={normal:"\u5065\u5eb7",warning:"\u9884\u8b66",danger:"\u5f02\u5e38"};')
+add('  var html="";')
+add('  ponds.forEach(function(p){')
+add('    html+="<div class=\\"pond-card\\" onclick=\\"switchPage(\'twin\')\\"><div class=\\"pond-card-title\\"><i data-lucide=\\"waves\\" style=\\"width:18px;height:18px;color:var(--accent-cyan)\\"></i>"+p.name+"<span class=\\"badge badge-"+sc[p.status]+"\\" style=\\"margin-left:auto\\">"+st[p.status]+"</span></div><div class=\\"pond-card-meta\\">\u54c1\u79cd: "+p.species+" \u00b7 \u9762\u79ef: "+p.area+"m\u00b2 \u00b7 \u6c34\u6df1: "+p.depth+"m \u00b7 \u5bc6\u5ea6: "+p.density+"</div><div class=\\"pond-card-stats\\"><div class=\\"pond-stat\\"><div class=\\"pond-stat-label\\">\u6eb6\u6c27</div><div class=\\"pond-stat-value\\">"+p.do+" mg/L</div></div><div class=\\"pond-stat\\"><div class=\\"pond-stat-label\\">\u6c34\u6e29</div><div class=\\"pond-stat-value\\">"+p.temp+"\u00b0C</div></div></div></div>";')
+add('  });')
+add('  document.getElementById("pondGrid").innerHTML=html;lucide.createIcons();')
+add('}')
+
+# Robots
+add('function renderRobots(){')
+add('  var robots=[')
+add('    {name:"AquaBot-01",status:"\u5de1\u822a\u4e2d",battery:78,task:"\u6eb6\u6c27\u8865\u6c27",pond:"1\u53f7\u9c7c\u5858",speed:"1.2 m/s"},')
+add('    {name:"AquaBot-02",status:"\u5145\u7535\u4e2d",battery:35,task:"\u5f85\u547d",pond:"\u5145\u7535\u7ad9",speed:"0 m/s"},')
+add('    {name:"AquaBot-03",status:"\u5de1\u822a\u4e2d",battery:92,task:"\u6c34\u8d28\u68c0\u6d4b",pond:"3\u53f7\u9c7c\u5858",speed:"0.8 m/s"}')
+add('  ];')
+add('  var html="";')
+add('  robots.forEach(function(r){')
+add('    html+="<div class=\\"robot-card\\"><div class=\\"robot-avatar\\"><i data-lucide=\\"bot\\"></i></div><div class=\\"robot-info\\"><div class=\\"robot-name\\">"+r.name+" <span class=\\"badge badge-"+(r.status==="\u5de1\u822a\u4e2d"?"green":"blue")+"\\" style=\\"margin-left:8px\\">"+r.status+"</span></div><div class=\\"robot-desc\\">\u4efb\u52a1: "+r.task+" \u00b7 \u4f4d\u7f6e: "+r.pond+" \u00b7 \u901f\u5ea6: "+r.speed+"</div></div><div class=\\"robot-stats\\"><div class=\\"robot-stat\\"><div class=\\"robot-stat-val\\" style=\\"color:"+(r.battery>50?"var(--accent-green)":"var(--accent-orange)")+"\\">"+r.battery+"%</div><div class=\\"robot-stat-label\\">\u7535\u91cf</div></div></div></div>";')
+add('  });')
+add('  document.getElementById("robotList").innerHTML=html;')
+add('  var tasks=[')
+add('    {task:"\u6eb6\u6c27\u8865\u6c27",robot:"AquaBot-01",time:"10:00 - 12:00",status:"\u8fdb\u884c\u4e2d"},')
+add('    {task:"\u6c34\u8d28\u5de1\u68c0",robot:"AquaBot-03",time:"09:30 - 11:30",status:"\u8fdb\u884c\u4e2d"},')
+add('    {task:"\u5168\u9762\u5de1\u5858",robot:"AquaBot-01",time:"14:00 - 16:00",status:"\u5f85\u6267\u884c"},')
+add('    {task:"\u81ea\u52a8\u8fd4\u822a\u5145\u7535",robot:"AquaBot-02",time:"08:00 - 10:00",status:"\u5df2\u5b8c\u6210"}')
+add('  ];')
+add('  var sb={"\u8fdb\u884c\u4e2d":"orange","\u5f85\u6267\u884c":"blue","\u5df2\u5b8c\u6210":"green"};')
+add('  var thtml="";')
+add('  tasks.forEach(function(t){thtml+="<tr><td>"+t.task+"</td><td>"+t.robot+"</td><td class=\\"mono\\">"+t.time+"</td><td><span class=\\"badge badge-"+sb[t.status]+"\\">"+t.status+"</span></td></tr>";});')
+add('  document.getElementById("taskTable").innerHTML=thtml;lucide.createIcons();')
+add('}')
+
+# Reports
+add('function renderReports(){')
+add('  var reports=[')
+add('    {id:"RPT-20260617-001",type:"\u65e5\u62a5",pond:"\u5168\u90e8",time:"2026-06-17 08:00",score:87,risk:"\u4f4e"},')
+add('    {id:"RPT-20260616-001",type:"\u65e5\u62a5",pond:"\u5168\u90e8",time:"2026-06-16 08:00",score:82,risk:"\u4f4e"},')
+add('    {id:"RPT-20260609-001",type:"\u5468\u62a5",pond:"\u5168\u90e8",time:"2026-06-09 09:00",score:79,risk:"\u4e2d"},')
+add('    {id:"RPT-20260601-001",type:"\u6708\u62a5",pond:"\u5168\u90e8",time:"2026-06-01 09:00",score:84,risk:"\u4f4e"},')
+add('    {id:"RPT-20260526-001",type:"\u65e5\u62a5",pond:"3\u53f7\u9c7c\u5858",time:"2026-05-26 08:00",score:65,risk:"\u9ad8"}')
+add('  ];')
+add('  var rb={"\u4f4e":"green","\u4e2d":"orange","\u9ad8":"red"};')
+add('  var html="";')
+add('  reports.forEach(function(r){')
+add('    html+="<tr><td class=\\"mono\\">"+r.id+"</td><td>"+r.type+"</td><td>"+r.pond+"</td><td class=\\"mono\\">"+r.time+"</td><td><strong>"+r.score+"</strong></td><td><span class=\\"badge badge-"+rb[r.risk]+"\\">"+r.risk+"\u98ce\u9669</span></td><td><button class=\\"btn\\" style=\\"padding:4px 10px;font-size:12px\\"><i data-lucide=\\"download\\" style=\\"width:12px;height:12px\\"></i> \u5bfc\u51fa</button></td></tr>";')
+add('  });')
+add('  document.getElementById("reportTable").innerHTML=html;lucide.createIcons();')
+add('}')
+add('document.getElementById("btnGenReport").addEventListener("click",function(){alert("\u62a5\u544a\u751f\u6210\u4e2d... \u5b8c\u6210\u540e\u5c06\u51fa\u73b0\u5728\u5217\u8868\u4e2d");});')
+
+# Twin sensor sidebar
+add('function renderTwinSensors(){')
+add('  var sensors=[')
+add('    {name:"\u6eb6\u6c27 DO",value:"7.2 mg/L",color:"var(--accent-green)"},')
+add('    {name:"\u6c34\u6e29",value:"26.3\u00b0C",color:"var(--accent-orange)"},')
+add('    {name:"pH\u503c",value:"7.4",color:"var(--accent-purple)"},')
+add('    {name:"\u6c28\u6c2e",value:"0.08 mg/L",color:"var(--accent-orange)"},')
+add('    {name:"\u6d4a\u5ea6",value:"12.5 NTU",color:"var(--accent-blue)"}')
+add('  ];')
+add('  var html="";')
+add('  sensors.forEach(function(s){')
+add('    html+="<div style=\\"display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)\\"><span style=\\"font-size:13px;color:var(--text-secondary)\\">"+s.name+"</span><span style=\\"font-family:var(--font-data);font-size:14px;font-weight:600;color:"+s.color+"\\">"+s.value+"</span></div>";')
+add('  });')
+add('  document.getElementById("twinSensorList").innerHTML=html;')
+add('  document.getElementById("twinRobotInfo").innerHTML="<div style=\\"font-size:13px;color:var(--text-secondary);line-height:1.8\\"><div style=\\"display:flex;justify-content:space-between\\"><span>\u8bbe\u5907</span><span style=\\"color:var(--text-primary);font-weight:500\\">AquaBot-01</span></div><div style=\\"display:flex;justify-content:space-between\\"><span>\u72b6\u6001</span><span class=\\"badge badge-green\\">\u5de1\u822a\u4e2d</span></div><div style=\\"display:flex;justify-content:space-between\\"><span>\u7535\u91cf</span><span style=\\"color:var(--accent-green);font-family:var(--font-data)\\">78%</span></div><div style=\\"display:flex;justify-content:space-between\\"><span>\u901f\u5ea6</span><span style=\\"font-family:var(--font-data)\\">1.2 m/s</span></div><div style=\\"display:flex;justify-content:space-between\\"><span>\u4efb\u52a1</span><span>\u6eb6\u6c27\u8865\u6c27</span></div></div>";')
+add('}')
+
+with open(OUT, 'a', encoding='utf-8') as f:
+    f.write('\n'.join(js))
+print('JS Part 2 written. Total:', os.path.getsize(OUT), 'bytes')

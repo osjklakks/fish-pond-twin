@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智氧兴渔 - 智能鱼塘监控系统</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+
+
+:root {
+  --bg-deep:#070b14;--bg-base:#0c1220;--bg-card:#111827;--bg-card-hover:#1a2332;
+  --bg-surface:#1e293b;--border:#1e293b;--border-light:#2d3a4d;
+  --text-primary:#f1f5f9;--text-secondary:#94a3b8;--text-muted:#64748b;
+  --accent-green:#22c55e;--accent-green-dim:rgba(34,197,94,.12);
+  --accent-blue:#38bdf8;--accent-blue-dim:rgba(56,189,248,.12);
+  --accent-orange:#f59e0b;--accent-orange-dim:rgba(245,158,11,.12);
+  --accent-red:#ef4444;--accent-red-dim:rgba(239,68,68,.12);
+  --accent-cyan:#22d3ee;--accent-cyan-dim:rgba(34,211,238,.12);
+  --accent-purple:#a78bfa;
+  --sidebar-w:220px;--header-h:56px;--radius:8px;--radius-lg:12px;
+  --font-data:"Fira Code","Noto Sans SC",monospace;
+  --font-ui:"Noto Sans SC",-apple-system,sans-serif;
+  --transition:.2s ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--font-ui);background:var(--bg-deep);color:var(--text-primary);overflow:hidden}
+body{display:flex}
+
+.sidebar{width:100%;height:56px;background:var(--bg-base);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;position:fixed;bottom:0;left:0;z-index:100}
+.sidebar-logo{display:none}
+.sidebar-nav{display:flex;align-items:center;gap:4px;padding:0 12px;overflow-x:auto}
+.nav-group-label{display:none}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 16px;border-radius:var(--radius);cursor:pointer;transition:all var(--transition);color:var(--text-muted);font-size:11px;text-decoration:none;position:relative;white-space:nowrap}
+.nav-item:hover{background:var(--bg-surface);color:var(--text-primary)}
+.nav-item.active{color:var(--accent-green)}
+.nav-item.active::after{content:"";position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);width:20px;height:2px;background:var(--accent-green);border-radius:2px}
+.nav-item i{width:20px;height:20px;flex-shrink:0}
+.nav-item span{font-size:10px}
+.nav-badge{position:absolute;top:2px;right:8px;background:var(--accent-red);color:#fff;font-size:9px;padding:0 5px;border-radius:8px;font-weight:600}
+
+.main{margin-bottom:56px;margin-left:0;flex:1;display:flex;flex-direction:column;height:100vh}
+.header{height:var(--header-h);background:var(--bg-base);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0}
+.header-left{display:flex;align-items:center;gap:16px}
+.header-title{font-size:16px;font-weight:600}
+.header-breadcrumb{font-size:13px;color:var(--text-muted)}
+.header-right{display:flex;align-items:center;gap:16px}
+.header-time{font-family:var(--font-data);font-size:13px;color:var(--text-secondary);background:var(--bg-card);padding:5px 12px;border-radius:var(--radius)}
+.header-status{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--accent-green)}
+.header-status .dot{width:8px;height:8px;background:var(--accent-green);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.content{flex:1;overflow-y:auto;padding:24px;background:var(--bg-deep)}
+.page{display:none}.page.active{display:block}
+
+.cards-row{display:grid;gap:16px;margin-bottom:20px}
+.cards-4{grid-template-columns:repeat(4,1fr)}
+.cards-3{grid-template-columns:repeat(3,1fr)}
+.cards-2{grid-template-columns:repeat(2,1fr)}
+.data-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;position:relative;transition:all var(--transition);overflow:hidden}
+.data-card:hover{border-color:var(--border-light);transform:translateY(-1px)}
+.data-card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.data-card-label{font-size:13px;color:var(--text-muted);font-weight:500}
+.data-card-icon{width:36px;height:36px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center}
+.data-card-icon i{width:20px;height:20px}
+.data-card-value{font-family:var(--font-data);font-size:28px;font-weight:700;line-height:1;margin-bottom:4px}
+.data-card-unit{font-size:13px;color:var(--text-muted);margin-left:4px;font-weight:400}
+.data-card-status{display:flex;align-items:center;gap:4px;font-size:12px;margin-top:8px}
+.data-card-status.normal{color:var(--accent-green)}.data-card-status.warning{color:var(--accent-orange)}.data-card-status.danger{color:var(--accent-red)}
+.data-card-bar{margin-top:10px;height:4px;background:var(--bg-surface);border-radius:2px;overflow:hidden}
+.data-card-bar-fill{height:100%;border-radius:2px;transition:width .5s ease}
+
+.section{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px}
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.section-title{font-size:15px;font-weight:600}
+.chart-container{width:100%;height:280px}
+.chart-container-lg{width:100%;height:360px}
+
+.btn{padding:6px 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg-surface);color:var(--text-secondary);font-size:13px;cursor:pointer;transition:all var(--transition);font-family:var(--font-ui);display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--bg-card-hover);color:var(--text-primary);border-color:var(--border-light)}
+.btn-primary{background:var(--accent-green);color:#000;border-color:var(--accent-green);font-weight:600}
+.btn-primary:hover{background:#16a34a}
+.btn-cta{background:var(--accent-orange);color:#000;border-color:var(--accent-orange);font-weight:700;padding:10px 24px;font-size:15px;border-radius:var(--radius-lg)}
+.btn-cta:hover{background:#d97706}
+.btn i{width:14px;height:14px}
+.tabs{display:flex;gap:4px;background:var(--bg-surface);padding:3px;border-radius:var(--radius)}
+.tab{padding:6px 14px;border-radius:6px;font-size:13px;color:var(--text-muted);cursor:pointer;transition:all var(--transition)}
+.tab.active{background:var(--bg-card);color:var(--text-primary)}
+.tab:hover:not(.active){color:var(--text-secondary)}
+
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{text-align:left;padding:10px 14px;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);background:var(--bg-surface)}
+.data-table td{padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border);color:var(--text-secondary)}
+.data-table tr:hover td{background:rgba(255,255,255,.02)}
+.data-table .mono{font-family:var(--font-data);font-size:12px}
+
+.badge{padding:3px 10px;border-radius:20px;font-size:12px;font-weight:500;display:inline-flex;align-items:center;gap:4px}
+.badge-green{background:var(--accent-green-dim);color:var(--accent-green)}
+.badge-orange{background:var(--accent-orange-dim);color:var(--accent-orange)}
+.badge-red{background:var(--accent-red-dim);color:var(--accent-red)}
+.badge-blue{background:var(--accent-blue-dim);color:var(--accent-blue)}
+.badge-purple{background:rgba(167,139,250,.12);color:var(--accent-purple)}
+
+.alert-item{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:var(--radius);margin-bottom:8px;border:1px solid var(--border)}
+.alert-item.warning{background:var(--accent-orange-dim);border-color:rgba(245,158,11,.2)}
+.alert-item.danger{background:var(--accent-red-dim);border-color:rgba(239,68,68,.2)}
+.alert-item.info{background:var(--accent-blue-dim);border-color:rgba(56,189,248,.2)}
+.alert-icon{flex-shrink:0;margin-top:2px}
+.alert-icon i{width:18px;height:18px}
+.alert-item.warning .alert-icon{color:var(--accent-orange)}
+.alert-item.danger .alert-icon{color:var(--accent-red)}
+.alert-item.info .alert-icon{color:var(--accent-blue)}
+.alert-content{flex:1}
+.alert-title{font-size:13px;font-weight:600;margin-bottom:2px}
+.alert-desc{font-size:12px;color:var(--text-muted)}
+.alert-time{font-size:11px;color:var(--text-muted);font-family:var(--font-data);margin-top:4px}
+
+.twin-container{display:grid;grid-template-columns:1fr 320px;gap:16px;height:calc(100vh - var(--header-h) - 48px - 80px)}
+.twin-canvas-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;position:relative}
+.twin-canvas-wrap canvas{display:block;width:100%;height:100%}
+.twin-overlay{position:absolute;top:12px;left:12px;display:flex;gap:6px}
+.twin-sidebar{display:flex;flex-direction:column;gap:12px}
+
+.pond-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.pond-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;cursor:pointer;transition:all var(--transition)}
+.pond-card:hover{border-color:var(--accent-cyan);transform:translateY(-2px)}
+.pond-card-title{font-size:15px;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.pond-card-meta{font-size:12px;color:var(--text-muted);margin-bottom:12px}
+.pond-card-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.pond-stat{background:var(--bg-surface);border-radius:6px;padding:8px 10px}
+.pond-stat-label{font-size:11px;color:var(--text-muted)}
+.pond-stat-value{font-family:var(--font-data);font-size:15px;font-weight:600}
+
+.robot-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;display:flex;align-items:center;gap:16px;transition:all var(--transition)}
+.robot-card:hover{border-color:var(--border-light)}
+.robot-avatar{width:56px;height:56px;border-radius:var(--radius-lg);background:var(--accent-cyan-dim);display:flex;align-items:center;justify-content:center}
+.robot-avatar i{width:28px;height:28px;color:var(--accent-cyan)}
+.robot-info{flex:1}
+.robot-name{font-size:15px;font-weight:600;margin-bottom:4px}
+.robot-desc{font-size:12px;color:var(--text-muted)}
+.robot-stats{display:flex;gap:16px}
+.robot-stat{text-align:center}
+.robot-stat-val{font-family:var(--font-data);font-size:16px;font-weight:600}
+.robot-stat-label{font-size:11px;color:var(--text-muted)}
+
+.report-filters{display:flex;gap:12px;margin-bottom:20px;align-items:flex-end}
+.form-group{margin-bottom:16px}
+.form-label{font-size:13px;color:var(--text-secondary);margin-bottom:6px;display:block;font-weight:500}
+.form-input{width:100%;padding:8px 12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:14px;font-family:var(--font-ui);transition:border-color var(--transition)}
+.form-input:focus{outline:none;border-color:var(--accent-green)}
+select.form-input{cursor:pointer}
+
+.wqi-ring{width:100px;height:100px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;border:3px solid var(--accent-green);margin:0 auto 8px}
+.wqi-score{font-family:var(--font-data);font-size:28px;font-weight:700;color:var(--accent-green)}
+.heatmap-legend{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted)}
+.heatmap-bar{width:120px;height:10px;border-radius:5px;background:linear-gradient(90deg,#22c55e,#eab308,#ef4444)}
+
+/* Hero section */
+.hero-section{min-height:calc(100vh - var(--header-h));display:flex;align-items:center;justify-content:center;padding:40px 24px;text-align:center}
+.hero-title{font-size:56px;font-weight:800;line-height:1.1;margin-bottom:16px;letter-spacing:-1px}
+.hero-title .accent{color:var(--accent-cyan)}
+.hero-subtitle{font-size:18px;color:var(--text-secondary);max-width:600px;margin:0 auto 32px;line-height:1.7}
+.hero-actions{display:flex;gap:12px;justify-content:center;margin-bottom:48px;flex-wrap:wrap}
+.hero-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:700px;margin:0 auto}
+.hero-stat{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;text-align:center}
+.hero-stat-val{font-family:var(--font-data);font-size:32px;font-weight:700;margin-bottom:4px}
+.hero-stat-label{font-size:13px;color:var(--text-muted)}
+
+/* Glass card (from file1) */
+.glass-card{background:rgba(17,24,39,.85);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;transition:all var(--transition)}
+.glass-card:hover{border-color:var(--border-light)}
+
+/* Footer */
+.footer{border-top:1px solid var(--border);padding:40px 24px;margin-top:40px}
+.footer-inner{max-width:1000px;margin:0 auto}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px;margin-bottom:32px}
+.footer-brand{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.footer-brand svg{width:24px;height:24px;color:var(--accent-cyan)}
+.footer-brand span{font-size:15px;font-weight:600}
+.footer-desc{font-size:13px;color:var(--text-muted);line-height:1.6}
+.footer-col-title{font-size:14px;font-weight:600;margin-bottom:12px}
+.footer-link{display:block;font-size:13px;color:var(--text-muted);padding:3px 0;cursor:pointer;transition:color var(--transition)}
+.footer-link:hover{color:var(--text-primary)}
+.footer-bottom{border-top:1px solid var(--border);padding-top:16px;text-align:center;font-size:12px;color:var(--text-muted)}
+
+/* Twin info cards */
+.twin-info-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.twin-info-title{font-size:14px;font-weight:600;margin-bottom:4px}
+.twin-info-desc{font-size:12px;color:var(--text-muted)}
+
+/* Report cards */
+.report-card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.report-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;cursor:pointer;transition:all var(--transition)}
+.report-card:hover{border-color:var(--accent-cyan);transform:translateY(-2px)}
+.report-card-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.report-card-icon{width:44px;height:44px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center}
+.report-card-icon i{width:22px;height:22px}
+.report-card-title{font-size:15px;font-weight:600}
+.report-card-desc{font-size:12px;color:var(--text-muted)}
+.report-card-footer{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-muted);margin-top:12px}
+
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--border-light)}
+
+@media(max-width:1200px){.cards-4{grid-template-columns:repeat(2,1fr)}.pond-grid{grid-template-columns:repeat(2,1fr)}.twin-container{grid-template-columns:1fr}.twin-sidebar{flex-direction:row;overflow-x:auto}.hero-stats{grid-template-columns:repeat(2,1fr)}.footer-grid{grid-template-columns:1fr 1fr}.report-card-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){.sidebar{width:60px}.sidebar-logo span,.nav-item span,.nav-group-label{display:none}.nav-item{justify-content:center;padding:12px}.main{margin-left:60px}.cards-4,.cards-3{grid-template-columns:1fr}.pond-grid,.report-card-grid{grid-template-columns:1fr}.hero-title{font-size:36px}.hero-stats{grid-template-columns:1fr 1fr}.footer-grid{grid-template-columns:1fr}}
+
+
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12c2-4 6-6 10-6s8 2 10 6c-2 4-6 6-10 6s-8-2-10-6z"/><path d="M12 6v12"/><path d="M6 9c2 1 4 2 6 2s4-1 6-2"/></svg>
+    <span>智氧兴渔</span>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-group-label">概览</div>
+    <a class="nav-item active" data-page="home"><i data-lucide="home"></i><span>首页</span></a>
+    <a class="nav-item" data-page="dashboard"><i data-lucide="layout-dashboard"></i><span>数据看板</span></a>
+    <div class="nav-group-label">管理</div>
+    <a class="nav-item" data-page="ponds"><i data-lucide="waves"></i><span>鱼塘管理</span></a>
+    <a class="nav-item" data-page="monitor"><i data-lucide="activity"></i><span>实时监控</span><span class="nav-badge" id="alertCount">3</span></a>
+    <a class="nav-item" data-page="twin"><i data-lucide="box"></i><span>数字孪生</span></a>
+    <div class="nav-group-label">设备</div>
+    <a class="nav-item" data-page="robot"><i data-lucide="bot"></i><span>机器人管理</span></a>
+    <div class="nav-group-label">分析</div>
+    <a class="nav-item" data-page="report"><i data-lucide="file-text"></i><span>报告中心</span></a>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div class="main">
+  <header class="header">
+    <div class="header-left">
+      <h1 class="header-title" id="pageTitle">首页</h1>
+      <span class="header-breadcrumb" id="pageBreadcrumb">智氧兴渔 / 智能鱼塘监控系统</span>
+    </div>
+    <div class="header-right">
+      <div class="header-status"><span class="dot"></span> 系统在线</div>
+      <div class="header-time" id="headerTime">--:--:--</div>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- Page: 首页 -->
+    <div class="page active" id="page-home">
+      <div class="hero-section">
+        <div style="max-width:800px;margin:0 auto;">
+          <div style="margin-bottom:12px;">
+            <span class="badge badge-green" style="font-size:13px;padding:5px 16px;">喷泉式智能增氧机器人</span>
+          </div>
+          <h1 class="hero-title">智氧<span class="accent">兴渔</span></h1>
+          <p class="hero-subtitle">基于数字孪生技术的智能鱼塘监控系统，实时监测水质参数，智能调控增氧设备</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" style="padding:12px 28px;font-size:15px;" onclick="switchPage('dashboard')"><i data-lucide="bar-chart-3"></i> 查看实时数据</button>
+            <button class="btn" style="padding:12px 28px;font-size:15px;" onclick="switchPage('twin')"><i data-lucide="box"></i> 数字孪生演示</button>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat"><div class="hero-stat-val" style="color:var(--accent-green)">12+</div><div class="hero-stat-label">监测参数</div></div>
+            <div class="hero-stat"><div class="hero-stat-val" style="color:var(--accent-orange)">99.9%</div><div class="hero-stat-label">数据准确率</div></div>
+            <div class="hero-stat"><div class="hero-stat-val" style="color:var(--accent-cyan)">24/7</div><div class="hero-stat-label">实时监控</div></div>
+            <div class="hero-stat"><div class="hero-stat-val" style="color:var(--accent-purple)">3D</div><div class="hero-stat-label">数字孪生</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="footer-inner">
+          <div class="footer-grid">
+            <div>
+              <div class="footer-brand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12c2-4 6-6 10-6s8 2 10 6c-2 4-6 6-10 6s-8-2-10-6z"/><path d="M12 6v12"/></svg><span>智氧兴渔</span></div>
+              <p class="footer-desc">基于数字孪生技术的智能鱼塘监控系统</p>
+            </div>
+            <div><h4 class="footer-col-title">产品功能</h4><a class="footer-link" onclick="switchPage('dashboard')">实时监控</a><a class="footer-link" onclick="switchPage('twin')">数字孪生</a><a class="footer-link" onclick="switchPage('report')">报告生成</a></div>
+            <div><h4 class="footer-col-title">技术支持</h4><a class="footer-link">使用文档</a><a class="footer-link">API接口</a><a class="footer-link">常见问题</a></div>
+            <div><h4 class="footer-col-title">联系我们</h4><span class="footer-link">邮箱: contact@zhiyaoxingyu.com</span><br><span class="footer-link">电话: 400-XXX-XXXX</span></div>
+          </div>
+          <div class="footer-bottom">&copy; 2024 智氧兴渔. 保留所有权利.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page: 数据看板 -->
+    <div class="page" id="page-dashboard">
+      <div class="cards-row cards-4" id="sensorCards"></div>
+      <div class="cards-row cards-2">
+        <div class="section">
+          <div class="section-header"><span class="section-title">溶氧趋势 (24h)</span><div class="tabs"><span class="tab active">24h</span><span class="tab">7d</span><span class="tab">30d</span></div></div>
+          <div class="chart-container" id="chartDoTrend"></div>
+        </div>
+        <div class="section">
+          <div class="section-header"><span class="section-title">水质综合评分</span></div>
+          <div style="display:flex;justify-content:center;align-items:center;gap:40px;height:280px;">
+            <div><div class="wqi-ring"><span class="wqi-score">87</span></div><div style="text-align:center;font-size:13px;color:var(--text-secondary)">综合评分</div></div>
+            <div class="chart-container" id="chartRadar" style="width:280px;height:260px;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="cards-row cards-2">
+        <div class="section">
+          <div class="section-header"><span class="section-title">实时告警</span></div>
+          <div id="alertList"></div>
+        </div>
+        <div class="section">
+          <div class="section-header"><span class="section-title">各鱼塘溶氧对比</span></div>
+          <div class="chart-container" id="chartPondBar"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page: 鱼塘管理 -->
+    <div class="page" id="page-ponds">
+      <div class="section" style="margin-bottom:20px;">
+        <div class="section-header"><span class="section-title">鱼塘列表</span><button class="btn btn-primary"><i data-lucide="plus"></i> 新增鱼塘</button></div>
+      </div>
+      <div class="pond-grid" id="pondGrid"></div>
+    </div>
+
+    <!-- Page: 实时监控 -->
+    <div class="page" id="page-monitor">
+      <div class="cards-row cards-4" id="monitorCards"></div>
+      <div class="cards-row cards-2">
+        <div class="section">
+          <div class="section-header"><span class="section-title">多参数实时曲线</span></div>
+          <div class="chart-container-lg" id="chartMultiTrend"></div>
+        </div>
+        <div class="section">
+          <div class="section-header"><span class="section-title">报警记录</span></div>
+          <table class="data-table">
+            <thead><tr><th>时间</th><th>鱼塘</th><th>类型</th><th>等级</th><th>状态</th></tr></thead>
+            <tbody id="alertTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page: 数字孪生 -->
+    <div class="page" id="page-twin">
+      <div class="section" style="padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="section-title">数字孪生 — 1号鱼塘</span>
+          <span class="badge badge-green">实时同步</span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div class="heatmap-legend"><span>低</span><div class="heatmap-bar"></div><span>高</span><span style="margin-left:8px;">溶氧热力图 (mg/L)</span></div>
+          <button class="btn" id="btnResetCam"><i data-lucide="maximize-2"></i> 重置视角</button>
+        </div>
+      </div>
+      <div class="twin-container">
+        <div class="twin-canvas-wrap">
+          <canvas id="twinCanvas"></canvas>
+          <div class="twin-overlay">
+            <button class="btn" id="btnHeatmap"><i data-lucide="flame"></i> 热力图</button>
+            <button class="btn" id="btnPath"><i data-lucide="route"></i> 轨迹</button>
+            <button class="btn" id="btnSensor"><i data-lucide="radio"></i> 传感器</button>
+          </div>
+        </div>
+        <div class="twin-sidebar">
+          <div class="section" style="margin-bottom:0;">
+            <div class="section-title" style="margin-bottom:12px;">实时传感数据</div>
+            <div id="twinSensorList"></div>
+          </div>
+          <div class="section" style="margin-bottom:0;">
+            <div class="section-title" style="margin-bottom:12px;">机器人状态</div>
+            <div id="twinRobotInfo"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page: 机器人管理 -->
+    <div class="page" id="page-robot">
+      <div class="cards-row cards-2" style="margin-bottom:20px;">
+        <div class="section" style="margin-bottom:0;">
+          <div class="section-header"><span class="section-title">设备列表</span></div>
+          <div id="robotList" style="display:flex;flex-direction:column;gap:12px;"></div>
+        </div>
+        <div class="section" style="margin-bottom:0;">
+          <div class="section-header"><span class="section-title">任务调度</span></div>
+          <table class="data-table">
+            <thead><tr><th>任务</th><th>机器人</th><th>时间</th><th>状态</th></tr></thead>
+            <tbody id="taskTable"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header"><span class="section-title">机器人电量趋势</span></div>
+        <div class="chart-container" id="chartRobot"></div>
+      </div>
+    </div>
+
+    <!-- Page: 报告中心 -->
+    <div class="page" id="page-report">
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">报告中心</span>
+          <button class="btn btn-primary" id="btnGenReport"><i data-lucide="file-plus"></i> 生成报告</button>
+        </div>
+        <div class="report-filters">
+          <div class="form-group" style="margin-bottom:0;"><label class="form-label">报告类型</label><select class="form-input" style="width:140px;"><option>日报</option><option>周报</option><option>月报</option></select></div>
+          <div class="form-group" style="margin-bottom:0;"><label class="form-label">鱼塘</label><select class="form-input" style="width:140px;"><option>全部</option><option>1号鱼塘</option><option>2号鱼塘</option><option>3号鱼塘</option></select></div>
+          <div class="form-group" style="margin-bottom:0;"><label class="form-label">日期范围</label><input type="date" class="form-input" style="width:160px;" value="2026-06-17"></div>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>报告编号</th><th>类型</th><th>鱼塘</th><th>生成时间</th><th>水质评分</th><th>风险等级</th><th>操作</th></tr></thead>
+          <tbody id="reportTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+
+var SD = {
+  do:{value:7.2,unit:"mg/L",label:"溶氧量",status:"normal",min:5,max:10,icon:"droplets"},
+  temp:{value:26.3,unit:"°C",label:"水温",status:"normal",min:15,max:35,icon:"thermometer"},
+  ph:{value:7.4,unit:"",label:"pH值",status:"normal",min:6.5,max:9,icon:"flask-conical"},
+  nh3:{value:0.08,unit:"mg/L",label:"氨氮",status:"warning",min:0,max:0.5,icon:"alert-triangle"},
+  turb:{value:12.5,unit:"NTU",label:"浊度",status:"normal",min:0,max:50,icon:"cloud"}
+};
+var H={do:[],temp:[],ph:[],nh3:[],turb:[],labels:[]};
+var showHeatmap=true,showPath=true,showSensor=true,robotAngle=0,twinInited=false;
+(function(){var now=new Date();for(var i=23;i>=0;i--){var t=new Date(now-i*3600000);H.labels.push(t.getHours()+":00");H.do.push(+(6.5+Math.random()*2).toFixed(1));H.temp.push(+(24+Math.random()*4).toFixed(1));H.ph.push(+(7+Math.random()*0.8).toFixed(1));H.nh3.push(+(0.05+Math.random()*0.1).toFixed(2));H.turb.push(+(8+Math.random()*10).toFixed(1));}})();
+document.addEventListener("DOMContentLoaded",function(){lucide.createIcons();});
+var titles={home:["首页","智氧兴渔 / 智能鱼塘监控系统"],dashboard:["数据看板","总览 / 数据看板"],ponds:["鱼塘管理","管理 / 鱼塘管理"],monitor:["实时监控","监控 / 实时监控"],twin:["数字孪生","数字孪生 / 3D场景"],robot:["机器人管理","设备 / 机器人管理"],report:["报告中心","分析 / 报告中心"]};
+function switchPage(page){
+  document.querySelectorAll(".page").forEach(function(p){p.classList.remove("active");});
+  document.querySelectorAll(".nav-item").forEach(function(n){n.classList.remove("active");});
+  document.getElementById("page-"+page).classList.add("active");
+  var el=document.querySelector('[data-page="'+page+'"]');if(el)el.classList.add("active");
+  if(titles[page]){document.getElementById("pageTitle").textContent=titles[page][0];document.getElementById("pageBreadcrumb").textContent=titles[page][1];}
+  if(page==="twin"&&!twinInited)setTimeout(initThreeScene,200);
+  if(window._charts)Object.values(window._charts).forEach(function(c){c.resize();});
+}
+document.querySelectorAll(".nav-item").forEach(function(el){el.addEventListener("click",function(){switchPage(el.dataset.page);});});
+function updateClock(){var now=new Date();document.getElementById("headerTime").textContent=now.toLocaleDateString("zh-CN",{month:"2-digit",day:"2-digit"})+" "+now.toLocaleTimeString("zh-CN",{hour12:false});}
+setInterval(updateClock,1000);updateClock();
+function renderSensorCards(){
+  var c=document.getElementById("sensorCards");
+  var cols={normal:"var(--accent-green)",warning:"var(--accent-orange)",danger:"var(--accent-red)"};
+  var bg={normal:"var(--accent-green-dim)",warning:"var(--accent-orange-dim)",danger:"var(--accent-red-dim)"};
+  var ics={normal:"check-circle",warning:"alert-circle",danger:"x-circle"};
+  var stx={normal:"正常",warning:"偏高",danger:"异常"};
+  var html="";for(var k in SD){var d=SD[k];
+    html+="<div class=\"data-card\"><div class=\"data-card-header\"><span class=\"data-card-label\">"+d.label+"</span><div class=\"data-card-icon\" style=\"background:"+bg[d.status]+"\"><i data-lucide=\""+d.icon+"\" style=\"color:"+cols[d.status]+"\"></i></div></div><div class=\"data-card-value\" style=\"color:"+cols[d.status]+"\">"+d.value+"<span class=\"data-card-unit\">"+d.unit+"</span></div><div class=\"data-card-status "+d.status+"\"><i data-lucide=\""+ics[d.status]+"\" style=\"width:14px;height:14px;\"></i> "+stx[d.status]+" · 范围 "+d.min+"-"+d.max+d.unit+"</div></div>";
+  }
+  c.innerHTML=html;lucide.createIcons();
+}
+function renderMonitorCards(){
+  var c=document.getElementById("monitorCards");var html="";for(var k in SD){var d=SD[k];
+    html+="<div class=\"data-card\"><div class=\"data-card-header\"><span class=\"data-card-label\">"+d.label+" 实时</span><div class=\"data-card-icon\" style=\"background:var(--accent-blue-dim)\"><i data-lucide=\"radio\" style=\"color:var(--accent-blue)\"></i></div></div><div class=\"data-card-value\" style=\"color:var(--accent-blue)\">"+d.value+"<span class=\"data-card-unit\">"+d.unit+"</span></div><div style=\"font-size:12px;color:var(--text-muted);margin-top:8px;\">采集频率: 5s · 上次更新: 刚刚</div></div>";
+  }
+  c.innerHTML=html;lucide.createIcons();
+}
+var alertsData=[
+  {type:"danger",title:"3号鱼塘溶氧偏低",desc:"溶氧降至4.2mg/L，低于安全阈值5.0mg/L",time:"10:23:15"},
+  {type:"warning",title:"2号鱼塘氨氮偏高",desc:"氨氮浓度0.12mg/L，接近预警线0.15mg/L",time:"09:45:02"},
+  {type:"info",title:"1号鱼塘机器人返航",desc:"AquaBot-01完成巡航任务，正在返航充电",time:"09:12:38"},
+  {type:"warning",title:"5号鱼塘水温偏高",desc:"水温达到30.2°C，建议开启增氧",time:"08:55:11"}
+];
+function renderAlerts(){
+  var ics={danger:"alert-octagon",warning:"alert-triangle",info:"info"};var html="";
+  alertsData.forEach(function(a){html+="<div class=\"alert-item "+a.type+"\"><div class=\"alert-icon\"><i data-lucide=\""+ics[a.type]+"\"></i></div><div class=\"alert-content\"><div class=\"alert-title\">"+a.title+"</div><div class=\"alert-desc\">"+a.desc+"</div><div class=\"alert-time\">"+a.time+"</div></div></div>";});
+  document.getElementById("alertList").innerHTML=html;
+  var rows=[{time:"10:23",pond:"3号鱼塘",type:"溶氧",level:"danger",status:"处理中"},{time:"09:45",pond:"2号鱼塘",type:"氨氮",level:"warning",status:"已通知"},{time:"09:12",pond:"1号鱼塘",type:"机器人",level:"info",status:"已处理"},{time:"08:55",pond:"5号鱼塘",type:"水温",level:"warning",status:"监控中"},{time:"07:30",pond:"4号鱼塘",type:"浊度",level:"info",status:"已恢复"}];
+  var lbc={danger:"red",warning:"orange",info:"blue"};var lt={danger:"严重",warning:"预警",info:"信息"};var sbc={"处理中":"orange","已通知":"blue","已处理":"green","监控中":"blue","已恢复":"green"};
+  var thtml="";rows.forEach(function(r){thtml+="<tr><td class=\"mono\">"+r.time+"</td><td>"+r.pond+"</td><td>"+r.type+"</td><td><span class=\"badge badge-"+lbc[r.level]+"\">"+lt[r.level]+"</span></td><td><span class=\"badge badge-"+sbc[r.status]+"\">"+r.status+"</span></td></tr>";});
+  document.getElementById("alertTable").innerHTML=thtml;lucide.createIcons();
+}function renderPondGrid(){
+  var ponds=[
+    {name:"1号鱼塘",area:"1200",depth:"2.5",species:"鲈鱼",density:"800尾/亩",do:7.2,temp:26.3,status:"normal"},
+    {name:"2号鱼塘",area:"800",depth:"2.0",species:"草鱼",density:"1200尾/亩",do:6.8,temp:25.8,status:"warning"},
+    {name:"3号鱼塘",area:"1500",depth:"3.0",species:"鲈鱼",density:"600尾/亩",do:4.2,temp:27.1,status:"danger"},
+    {name:"4号鱼塘",area:"600",depth:"1.8",species:"鲫鱼",density:"1500尾/亩",do:7.5,temp:24.9,status:"normal"},
+    {name:"5号鱼塘",area:"1000",depth:"2.2",species:"鲈鱼",density:"900尾/亩",do:6.1,temp:30.2,status:"warning"},
+    {name:"6号鱼塘",area:"900",depth:"2.0",species:"鲤鱼",density:"1000尾/亩",do:7.8,temp:25.5,status:"normal"}
+  ];
+  var sc={normal:"green",warning:"orange",danger:"red"};
+  var st={normal:"健康",warning:"预警",danger:"异常"};
+  var html="";
+  ponds.forEach(function(p){
+    html+="<div class=\"pond-card\" onclick=\"switchPage('twin')\"><div class=\"pond-card-title\"><i data-lucide=\"waves\" style=\"width:18px;height:18px;color:var(--accent-cyan)\"></i>"+p.name+"<span class=\"badge badge-"+sc[p.status]+"\" style=\"margin-left:auto\">"+st[p.status]+"</span></div><div class=\"pond-card-meta\">品种: "+p.species+" · 面积: "+p.area+"m² · 水深: "+p.depth+"m · 密度: "+p.density+"</div><div class=\"pond-card-stats\"><div class=\"pond-stat\"><div class=\"pond-stat-label\">溶氧</div><div class=\"pond-stat-value\">"+p.do+" mg/L</div></div><div class=\"pond-stat\"><div class=\"pond-stat-label\">水温</div><div class=\"pond-stat-value\">"+p.temp+"°C</div></div></div></div>";
+  });
+  document.getElementById("pondGrid").innerHTML=html;lucide.createIcons();
+}
+function renderRobots(){
+  var robots=[
+    {name:"AquaBot-01",status:"巡航中",battery:78,task:"溶氧补氧",pond:"1号鱼塘",speed:"1.2 m/s"},
+    {name:"AquaBot-02",status:"充电中",battery:35,task:"待命",pond:"充电站",speed:"0 m/s"},
+    {name:"AquaBot-03",status:"巡航中",battery:92,task:"水质检测",pond:"3号鱼塘",speed:"0.8 m/s"}
+  ];
+  var html="";
+  robots.forEach(function(r){
+    html+="<div class=\"robot-card\"><div class=\"robot-avatar\"><i data-lucide=\"bot\"></i></div><div class=\"robot-info\"><div class=\"robot-name\">"+r.name+" <span class=\"badge badge-"+(r.status==="巡航中"?"green":"blue")+"\" style=\"margin-left:8px\">"+r.status+"</span></div><div class=\"robot-desc\">任务: "+r.task+" · 位置: "+r.pond+" · 速度: "+r.speed+"</div></div><div class=\"robot-stats\"><div class=\"robot-stat\"><div class=\"robot-stat-val\" style=\"color:"+(r.battery>50?"var(--accent-green)":"var(--accent-orange)")+"\">"+r.battery+"%</div><div class=\"robot-stat-label\">电量</div></div></div></div>";
+  });
+  document.getElementById("robotList").innerHTML=html;
+  var tasks=[
+    {task:"溶氧补氧",robot:"AquaBot-01",time:"10:00 - 12:00",status:"进行中"},
+    {task:"水质巡检",robot:"AquaBot-03",time:"09:30 - 11:30",status:"进行中"},
+    {task:"全面巡塘",robot:"AquaBot-01",time:"14:00 - 16:00",status:"待执行"},
+    {task:"自动返航充电",robot:"AquaBot-02",time:"08:00 - 10:00",status:"已完成"}
+  ];
+  var sb={"进行中":"orange","待执行":"blue","已完成":"green"};
+  var thtml="";
+  tasks.forEach(function(t){thtml+="<tr><td>"+t.task+"</td><td>"+t.robot+"</td><td class=\"mono\">"+t.time+"</td><td><span class=\"badge badge-"+sb[t.status]+"\">"+t.status+"</span></td></tr>";});
+  document.getElementById("taskTable").innerHTML=thtml;lucide.createIcons();
+}
+function renderReports(){
+  var reports=[
+    {id:"RPT-20260617-001",type:"日报",pond:"全部",time:"2026-06-17 08:00",score:87,risk:"低"},
+    {id:"RPT-20260616-001",type:"日报",pond:"全部",time:"2026-06-16 08:00",score:82,risk:"低"},
+    {id:"RPT-20260609-001",type:"周报",pond:"全部",time:"2026-06-09 09:00",score:79,risk:"中"},
+    {id:"RPT-20260601-001",type:"月报",pond:"全部",time:"2026-06-01 09:00",score:84,risk:"低"},
+    {id:"RPT-20260526-001",type:"日报",pond:"3号鱼塘",time:"2026-05-26 08:00",score:65,risk:"高"}
+  ];
+  var rb={"低":"green","中":"orange","高":"red"};
+  var html="";
+  reports.forEach(function(r){
+    html+="<tr><td class=\"mono\">"+r.id+"</td><td>"+r.type+"</td><td>"+r.pond+"</td><td class=\"mono\">"+r.time+"</td><td><strong>"+r.score+"</strong></td><td><span class=\"badge badge-"+rb[r.risk]+"\">"+r.risk+"风险</span></td><td><button class=\"btn\" style=\"padding:4px 10px;font-size:12px\"><i data-lucide=\"download\" style=\"width:12px;height:12px\"></i> 导出</button></td></tr>";
+  });
+  document.getElementById("reportTable").innerHTML=html;lucide.createIcons();
+}
+document.getElementById("btnGenReport").addEventListener("click",function(){alert("报告生成中... 完成后将出现在列表中");});
+function renderTwinSensors(){
+  var sensors=[
+    {name:"溶氧 DO",value:"7.2 mg/L",color:"var(--accent-green)"},
+    {name:"水温",value:"26.3°C",color:"var(--accent-orange)"},
+    {name:"pH值",value:"7.4",color:"var(--accent-purple)"},
+    {name:"氨氮",value:"0.08 mg/L",color:"var(--accent-orange)"},
+    {name:"浊度",value:"12.5 NTU",color:"var(--accent-blue)"}
+  ];
+  var html="";
+  sensors.forEach(function(s){
+    html+="<div style=\"display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)\"><span style=\"font-size:13px;color:var(--text-secondary)\">"+s.name+"</span><span style=\"font-family:var(--font-data);font-size:14px;font-weight:600;color:"+s.color+"\">"+s.value+"</span></div>";
+  });
+  document.getElementById("twinSensorList").innerHTML=html;
+  document.getElementById("twinRobotInfo").innerHTML="<div style=\"font-size:13px;color:var(--text-secondary);line-height:1.8\"><div style=\"display:flex;justify-content:space-between\"><span>设备</span><span style=\"color:var(--text-primary);font-weight:500\">AquaBot-01</span></div><div style=\"display:flex;justify-content:space-between\"><span>状态</span><span class=\"badge badge-green\">巡航中</span></div><div style=\"display:flex;justify-content:space-between\"><span>电量</span><span style=\"color:var(--accent-green);font-family:var(--font-data)\">78%</span></div><div style=\"display:flex;justify-content:space-between\"><span>速度</span><span style=\"font-family:var(--font-data)\">1.2 m/s</span></div><div style=\"display:flex;justify-content:space-between\"><span>任务</span><span>溶氧补氧</span></div></div>";
+}// ===== ECharts =====
+function initCharts(){
+  var doChart=echarts.init(document.getElementById("chartDoTrend"));
+  doChart.setOption({backgroundColor:"transparent",grid:{left:50,right:20,top:20,bottom:30},xAxis:{type:"category",data:H.labels,axisLine:{lineStyle:{color:"#1e293b"}},axisLabel:{color:"#64748b",fontSize:11},axisTick:{show:false}},yAxis:{type:"value",min:4,max:10,splitLine:{lineStyle:{color:"#1e293b"}},axisLabel:{color:"#64748b",fontSize:11},axisLine:{show:false}},series:[{type:"line",data:H.do,smooth:true,symbol:"none",lineStyle:{color:"#22c55e",width:2},areaStyle:{color:{type:"linear",x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:"rgba(34,197,94,.25)"},{offset:1,color:"rgba(34,197,94,0)"}]}},markLine:{silent:true,lineStyle:{color:"#ef4444",type:"dashed"},data:[{yAxis:5,label:{formatter:"安全线 5.0",color:"#ef4444",fontSize:11}}]}}],tooltip:{trigger:"axis",backgroundColor:"#1e293b",borderColor:"#334155",textStyle:{color:"#f1f5f9",fontSize:12}}});
+  var radarChart=echarts.init(document.getElementById("chartRadar"));
+  radarChart.setOption({backgroundColor:"transparent",radar:{indicator:[{name:"溶氧",max:10},{name:"pH",max:14},{name:"水温",max:40},{name:"氨氮",max:0.5},{name:"浊度",max:50}],axisName:{color:"#94a3b8",fontSize:12},splitArea:{areaStyle:{color:["rgba(30,41,59,.3)","rgba(30,41,59,.15)"]}},axisLine:{lineStyle:{color:"#1e293b"}},splitLine:{lineStyle:{color:"#1e293b"}}},series:[{type:"radar",data:[{value:[7.2,7.4,26.3,0.08,12.5],name:"当前值",areaStyle:{color:"rgba(34,197,94,.15)"},lineStyle:{color:"#22c55e"},itemStyle:{color:"#22c55e"}}]}],tooltip:{backgroundColor:"#1e293b",borderColor:"#334155",textStyle:{color:"#f1f5f9"}}});
+  var barChart=echarts.init(document.getElementById("chartPondBar"));
+  barChart.setOption({backgroundColor:"transparent",grid:{left:60,right:20,top:10,bottom:30},xAxis:{type:"category",data:["1号塘","2号塘","3号塘","4号塘","5号塘","6号塘"],axisLine:{lineStyle:{color:"#1e293b"}},axisLabel:{color:"#64748b"},axisTick:{show:false}},yAxis:{type:"value",name:"溶氧 mg/L",nameTextStyle:{color:"#64748b"},splitLine:{lineStyle:{color:"#1e293b"}},axisLabel:{color:"#64748b"},axisLine:{show:false}},series:[{type:"bar",barWidth:28,data:[{value:7.2,itemStyle:{color:"#22c55e"}},{value:6.8,itemStyle:{color:"#22c55e"}},{value:4.2,itemStyle:{color:"#ef4444"}},{value:7.5,itemStyle:{color:"#22c55e"}},{value:6.1,itemStyle:{color:"#f59e0b"}},{value:7.8,itemStyle:{color:"#22c55e"}}],markLine:{silent:true,lineStyle:{color:"#ef4444",type:"dashed"},data:[{yAxis:5}]}}],tooltip:{trigger:"axis",backgroundColor:"#1e293b",borderColor:"#334155",textStyle:{color:"#f1f5f9"}}});
+  var multiChart=echarts.init(document.getElementById("chartMultiTrend"));
+  multiChart.setOption({backgroundColor:"transparent",grid:{left:50,right:50,top:30,bottom:30},legend:{data:["溶氧","水温","pH"],textStyle:{color:"#94a3b8",fontSize:12},top:0},xAxis:{type:"category",data:H.labels,axisLine:{lineStyle:{color:"#1e293b"}},axisLabel:{color:"#64748b",fontSize:11},axisTick:{show:false}},yAxis:[{type:"value",name:"mg/L / pH",splitLine:{lineStyle:{color:"#1e293b"}},axisLabel:{color:"#64748b"},axisLine:{show:false}},{type:"value",name:"°C",splitLine:{show:false},axisLabel:{color:"#64748b"},axisLine:{show:false}}],series:[{name:"溶氧",type:"line",data:H.do,smooth:true,symbol:"none",lineStyle:{color:"#22c55e",width:2},itemStyle:{color:"#22c55e"}},{name:"pH",type:"line",data:H.ph,smooth:true,symbol:"none",lineStyle:{color:"#a78bfa",width:2},itemStyle:{color:"#a78bfa"}},{name:"水温",type:"line",yAxisIndex:1,data:H.temp,smooth:true,symbol:"none",lineStyle:{color:"#f59e0b",width:2},itemStyle:{color:"#f59e0b"}}],tooltip:{trigger:"axis",backgroundColor:"#1e293b",borderColor:"#334155",textStyle:{color:"#f1f5f9",fontSize:12}}});
+  var robotChart=echarts.init(document.getElementById("chartRobot"));
+  var rh=[];for(var i=0;i<12;i++)rh.push((8+i)+":00");
+  robotChart.setOption({backgroundColor:"transparent",grid:{left:50,right:50,top:30,bottom:30},legend:{data:["AquaBot-01","AquaBot-02","AquaBot-03"],textStyle:{color:"#94a3b8",fontSize:12},top:0},xAxis:{type:"category",data:rh,axisLine:{lineStyle:{color:"#1e293b"}},axisLabel:{color:"#64748b"},axisTick:{show:false}},yAxis:{type:"value",max:100,name:"电量 %",nameTextStyle:{color:"#64748b"},splitLine:{lineStyle:{color:"#1e293b"}},axisLabel:{color:"#64748b"},axisLine:{show:false}},series:[{name:"AquaBot-01",type:"line",data:[100,95,88,82,78,75,70,65,60,55,50,45],smooth:true,symbol:"none",lineStyle:{color:"#22d3ee",width:2},itemStyle:{color:"#22d3ee"}},{name:"AquaBot-02",type:"line",data:[20,25,30,35,40,50,60,70,80,85,90,95],smooth:true,symbol:"none",lineStyle:{color:"#a78bfa",width:2},itemStyle:{color:"#a78bfa"}},{name:"AquaBot-03",type:"line",data:[100,98,96,94,92,90,88,86,84,82,80,78],smooth:true,symbol:"none",lineStyle:{color:"#22c55e",width:2},itemStyle:{color:"#22c55e"}}],tooltip:{trigger:"axis",backgroundColor:"#1e293b",borderColor:"#334155",textStyle:{color:"#f1f5f9"}}});
+  renderTwinSensors();
+  window.addEventListener("resize",function(){doChart.resize();radarChart.resize();barChart.resize();multiChart.resize();robotChart.resize();});
+  window._charts={doChart:doChart,radarChart:radarChart,barChart:barChart,multiChart:multiChart,robotChart:robotChart};
+}
+// ===== Three.js Digital Twin =====
+function initThreeScene(){
+  try{
+    twinInited=true;
+    var canvas=document.getElementById("twinCanvas");
+    if(!canvas){console.error("[Twin] canvas not found");return;}
+    var container=canvas.parentElement;
+    var W=container.clientWidth||window.innerWidth-260;
+    var Ht=container.clientHeight||window.innerHeight-160;
+    if(W<100||Ht<100){
+      console.warn("[Twin] container too small, retrying in 500ms",W,Ht);
+      twinInited=false;
+      setTimeout(initThreeScene,500);
+      return;
+    }
+    console.log("[Twin] init",W,"x",Ht);
+    var scene=new THREE.Scene();
+    scene.background=new THREE.Color(0x070b14);
+    scene.fog=new THREE.FogExp2(0x070b14,0.015);
+    var camera=new THREE.PerspectiveCamera(50,W/Ht,0.1,200);
+    camera.position.set(18,14,18);camera.lookAt(0,0,0);
+    var renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true});
+    renderer.setSize(W,Ht);renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+    var controls=new THREE.OrbitControls(camera,renderer.domElement);
+    controls.enableDamping=true;controls.dampingFactor=0.05;
+    controls.maxPolarAngle=Math.PI/2.2;controls.minDistance=8;controls.maxDistance=40;
+    scene.add(new THREE.AmbientLight(0x4488aa,0.6));
+    var dl=new THREE.DirectionalLight(0xffffff,0.8);dl.position.set(10,20,10);scene.add(dl);
+    var pl=new THREE.PointLight(0x22d3ee,0.5,30);pl.position.set(0,5,0);scene.add(pl);
+    var gnd=new THREE.Mesh(new THREE.PlaneGeometry(60,60),new THREE.MeshStandardMaterial({color:0x1a2a1a,roughness:0.9}));
+    gnd.rotation.x=-Math.PI/2;gnd.position.y=-0.5;scene.add(gnd);
+    var sh=new THREE.Shape();sh.moveTo(-12,-8);sh.lineTo(12,-8);sh.lineTo(12,8);sh.lineTo(-12,8);sh.lineTo(-12,-8);
+    var hole=new THREE.Path();hole.moveTo(-10,-6);hole.lineTo(10,-6);hole.lineTo(10,6);hole.lineTo(-10,6);hole.lineTo(-10,-6);
+    sh.holes.push(hole);
+    var shore=new THREE.Mesh(new THREE.ShapeGeometry(sh),new THREE.MeshStandardMaterial({color:0x3d2b1f,roughness:1}));
+    shore.rotation.x=-Math.PI/2;shore.position.y=-0.3;scene.add(shore);
+    var waterGeo=new THREE.PlaneGeometry(20,12,80,48);
+    var waterMat=new THREE.MeshPhongMaterial({color:0x0c4a6e,transparent:true,opacity:0.85,shininess:100,specular:0x22d3ee,side:THREE.DoubleSide});
+    var water=new THREE.Mesh(waterGeo,waterMat);water.rotation.x=-Math.PI/2;water.position.y=0;scene.add(water);
+    var heatGroup=new THREE.Group();scene.add(heatGroup);var hps=[];
+    for(var x=-9;x<=9;x+=1.5){for(var z=-5;z<=5;z+=1.5){var v=Math.random();var c=new THREE.Color().setHSL(0.35-v*0.35,0.8,0.4+v*0.2);var sp=new THREE.Mesh(new THREE.SphereGeometry(0.2,8,8),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:0.6}));sp.position.set(x,0.3,z);heatGroup.add(sp);hps.push({m:sp,b:v});}}
+    var senGroup=new THREE.Group();scene.add(senGroup);
+    [{x:-5,z:-3},{x:3,z:-2},{x:-2,z:3},{x:6,z:2}].forEach(function(s){var mk=new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.15,1.5,8),new THREE.MeshStandardMaterial({color:0x22d3ee,emissive:0x22d3ee,emissiveIntensity:0.3}));mk.position.set(s.x,0.75,s.z);senGroup.add(mk);var tp=new THREE.Mesh(new THREE.SphereGeometry(0.2,8,8),new THREE.MeshBasicMaterial({color:0x22d3ee}));tp.position.set(s.x,1.5,s.z);senGroup.add(tp);});
+    var rbt=new THREE.Group();
+    rbt.add(new THREE.Mesh(new THREE.BoxGeometry(1,0.4,0.6),new THREE.MeshStandardMaterial({color:0x22c55e,emissive:0x22c55e,emissiveIntensity:0.2})));
+    var cn=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.3,0.4),new THREE.MeshStandardMaterial({color:0x16a34a}));cn.position.y=0.35;rbt.add(cn);
+    var nz=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,0.4,8),new THREE.MeshStandardMaterial({color:0x94a3b8}));nz.position.set(0.4,0.4,0);rbt.add(nz);
+    rbt.position.y=0.3;scene.add(rbt);
+    var pathGroup=new THREE.Group();scene.add(pathGroup);var pp=[];
+    for(var t=0;t<Math.PI*2;t+=0.05)pp.push(new THREE.Vector3(Math.cos(t)*7+Math.sin(t*2)*1.5,0.15,Math.sin(t)*4+Math.cos(t*3)*0.8));
+    var pathCurve=new THREE.CatmullRomCurve3(pp,true);
+    pathGroup.add(new THREE.Mesh(new THREE.TubeGeometry(pathCurve,200,0.03,4,true),new THREE.MeshBasicMaterial({color:0x22c55e,transparent:true,opacity:0.3})));
+    document.getElementById("btnHeatmap").addEventListener("click",function(){showHeatmap=!showHeatmap;});
+    document.getElementById("btnPath").addEventListener("click",function(){showPath=!showPath;});
+    document.getElementById("btnSensor").addEventListener("click",function(){showSensor=!showSensor;});
+    document.getElementById("btnResetCam").addEventListener("click",function(){camera.position.set(18,14,18);controls.target.set(0,0,0);controls.update();});
+    var clock=new THREE.Clock();
+    function animate(){
+      requestAnimationFrame(animate);
+      var t=clock.getElapsedTime();
+      var pos=waterGeo.attributes.position;
+      for(var i=0;i<pos.count;i++){var px=pos.getX(i),pz=pos.getZ(i);pos.setY(i,Math.sin(px*0.5+t*1.5)*0.08+Math.cos(pz*0.8+t*1.2)*0.06);}
+      pos.needsUpdate=true;waterGeo.computeVertexNormals();
+      hps.forEach(function(p,idx){var v=p.b+Math.sin(t*0.5+idx)*0.1;v=Math.max(0,Math.min(1,v));p.m.material.color.setHSL(0.35-v*0.35,0.8,0.4+v*0.2);p.m.position.y=0.3+Math.sin(t+idx*0.3)*0.05;});
+      heatGroup.visible=showHeatmap;senGroup.visible=showSensor;pathGroup.visible=showPath;
+      robotAngle+=0.002;var rp=pathCurve.getPointAt(robotAngle%1);var la=pathCurve.getPointAt((robotAngle+0.01)%1);
+      rbt.position.x=rp.x;rbt.position.z=rp.z;rbt.lookAt(la.x,rbt.position.y,la.z);rbt.position.y=0.3+Math.sin(t*3)*0.03;
+      controls.update();renderer.render(scene,camera);
+    }
+    animate();
+    window.addEventListener("resize",function(){
+      var w=container.clientWidth||window.innerWidth-260;
+      var h=container.clientHeight||window.innerHeight-160;
+      camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h);
+    });
+    console.log("[Twin] scene ready");
+  }catch(e){console.error("[Twin] init error:",e);}
+}// ===== Data Simulation =====
+function simulateData(){
+  function jit(v,r){return +(v+(Math.random()-0.5)*r).toFixed(1);}
+  SD.do.value=jit(SD.do.value,0.4);
+  SD.temp.value=jit(SD.temp.value,0.3);
+  SD.ph.value=+(SD.ph.value+(Math.random()-0.5)*0.1).toFixed(1);
+  SD.nh3.value=+(SD.nh3.value+(Math.random()-0.5)*0.02).toFixed(2);
+  SD.turb.value=jit(SD.turb.value,1);
+  SD.do.status=SD.do.value<5?"danger":SD.do.value<6?"warning":"normal";
+  SD.nh3.status=SD.nh3.value>0.15?"danger":SD.nh3.value>0.1?"warning":"normal";
+  SD.temp.status=SD.temp.value>30?"warning":"normal";
+  renderSensorCards();
+}
+// ===== Init =====
+window.addEventListener("DOMContentLoaded",function(){
+  renderSensorCards();renderMonitorCards();renderAlerts();
+  renderPondGrid();renderRobots();renderReports();
+  setTimeout(initCharts,300);
+  setInterval(simulateData,5000);
+});
+
+</script>
+</body>
+</html>
